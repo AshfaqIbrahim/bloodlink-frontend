@@ -1,0 +1,252 @@
+import { useState } from "react";
+import { Mail, Lock, Eye, EyeOff, Check } from "lucide-react";
+import { Link } from "react-router-dom";
+
+const InputField = ({
+  icon: Icon,
+  label,
+  type,
+  placeholder,
+  value,
+  onChange,
+  rightIcon,
+  onRightIconClick,
+}) => (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-[#1C2321] mb-1.5">
+      {label}
+    </label>
+    <div className="relative">
+      {Icon && (
+        <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8C8579] w-5 h-5" />
+      )}
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full h-14 pl-11 pr-11 rounded-xl border border-[#8C8579]/20 bg-white text-[#1C2321] placeholder:text-[#8C8579]/60 text-base focus:outline-none focus:ring-2 focus:ring-[#7A2F2F] focus:border-transparent transition-all duration-200"
+      />
+      {rightIcon && (
+        <button
+          type="button"
+          onClick={onRightIconClick}
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8C8579] hover:text-[#1C2321] transition-colors"
+        >
+          {rightIcon}
+        </button>
+      )}
+    </div>
+  </div>
+);
+
+const Button = ({ children, variant = "primary", className, ...props }) => {
+  const base =
+    "w-full h-14 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 text-base";
+  const variants = {
+    primary:
+      "bg-[#7A2F2F] text-white hover:bg-[#631f1f] shadow-sm hover:shadow-md active:scale-[0.98]",
+    secondary:
+      "bg-white text-[#1C2321] border border-[#8C8579]/30 hover:border-[#8C8579]/60 hover:bg-[#F6F3EC]/50 active:scale-[0.98]",
+  };
+  return (
+    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+};
+
+const Checkbox = ({ label, checked, onChange }) => (
+  <label className="flex items-center gap-2.5 text-sm text-[#1C2321] cursor-pointer group">
+    <div className="relative flex items-center justify-center w-5 h-5">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="peer appearance-none w-5 h-5 border border-[#8C8579]/40 rounded checked:border-[#7A2F2F] checked:bg-[#7A2F2F] transition-all duration-200 cursor-pointer"
+      />
+      <Check className="absolute text-white w-3.5 h-3.5 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+    </div>
+    <span className="select-none">{label}</span>
+  </label>
+);
+
+function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+
+  return (
+    <div className="h-screen flex items-center justify-center p-6 bg-[#F6F3EC] animate-fadeIn relative overflow-hidden">
+      {/* Page Label */}
+      <div className="absolute top-6 left-6 bg-[#7A2F2F]/10 text-[#7A2F2F] px-4 py-1.5 rounded-full text-sm font-medium border border-[#7A2F2F]/20 z-10">
+        Login Page
+      </div>
+
+      <div className="w-full max-w-[1200px] h-[90vh] max-h-[800px] grid grid-cols-1 lg:grid-cols-[42%_58%] bg-[#F6F3EC] rounded-3xl overflow-hidden shadow-2xl shadow-[#1C2321]/5">
+        {/* LEFT PANEL */}
+        <div className="p-10 lg:p-12 flex flex-col justify-center order-2 lg:order-1">
+          <div className="mb-6 flex justify-center">
+            <svg
+              className="w-full max-w-[240px]"
+              viewBox="0 0 280 130"
+              fill="none"
+            >
+              <path
+                d="M40 100 C80 50, 120 35, 160 70 C200 105, 240 85, 260 60"
+                stroke="#7A2F2F"
+                strokeWidth="1.5"
+                strokeDasharray="5 5"
+                opacity="0.3"
+              />
+              <circle cx="60" cy="85" r="10" fill="#7A2F2F" opacity="0.12" />
+              <circle cx="120" cy="60" r="14" fill="#3F6B5C" opacity="0.1" />
+              <circle cx="200" cy="75" r="10" fill="#7A2F2F" opacity="0.1" />
+              <path
+                d="M90 45 L98 30 L106 45 L120 42 L110 53 L115 68 L100 60 L90 70 L83 58 L73 60 L77 45 L90 45Z"
+                fill="#7A2F2F"
+                opacity="0.06"
+              />
+            </svg>
+          </div>
+          <h1 className="font-poppins font-bold text-4xl lg:text-5xl leading-tight text-[#1C2321] mb-3">
+            Connecting Donors.
+            <br />
+            Saving Lives.
+          </h1>
+          <p className="text-base text-[#5a554a] max-w-md mb-5 leading-relaxed">
+            BloodLink intelligently connects nearby blood donors, recipients,
+            and hospitals in real time during emergencies.
+          </p>
+          <div className="flex flex-wrap gap-6">
+            <div>
+              <span className="font-poppins font-semibold text-2xl text-[#1C2321]">
+                15,000+
+              </span>
+              <p className="text-sm text-[#8C8579]">Registered Donors</p>
+            </div>
+            <div>
+              <span className="font-poppins font-semibold text-2xl text-[#1C2321]">
+                500+
+              </span>
+              <p className="text-sm text-[#8C8579]">Hospitals</p>
+            </div>
+            <div>
+              <span className="font-poppins font-semibold text-2xl text-[#1C2321]">
+                24/7
+              </span>
+              <p className="text-sm text-[#8C8579]">Emergency Support</p>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT PANEL */}
+        <div className="p-8 lg:p-12 flex items-center justify-center order-1 lg:order-2 bg-[#FCFBF8] lg:bg-transparent">
+          <div className="w-full max-w-md bg-[#FCFBF8] rounded-3xl p-8 lg:p-10 shadow-xl shadow-[#1C2321]/5 animate-slideUp">
+            <div className="mb-6">
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-9 h-9 bg-[#7A2F2F]/10 rounded-xl flex items-center justify-center">
+                  <div className="w-4 h-4 bg-[#7A2F2F] rounded-full" />
+                </div>
+                <span className="font-poppins font-bold text-xl text-[#1C2321]">
+                  BloodLink
+                </span>
+              </div>
+              <h2 className="font-poppins font-semibold text-2xl text-[#1C2321]">
+                Welcome Back
+              </h2>
+              <p className="text-[#8C8579] text-sm">
+                Login to your account to continue.
+              </p>
+            </div>
+
+            <form onSubmit={(e) => e.preventDefault()}>
+              <InputField
+                icon={Mail}
+                label="Email Address"
+                type="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <InputField
+                icon={Lock}
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                rightIcon={
+                  showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )
+                }
+                onRightIconClick={() => setShowPassword(!showPassword)}
+              />
+
+              <div className="flex items-center justify-between mb-4">
+                <Checkbox
+                  label="Remember Me"
+                  checked={rememberMe}
+                  onChange={() => setRememberMe(!rememberMe)}
+                />
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-[#7A2F2F] font-medium hover:underline"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+
+              <Button className="mb-4">Log In</Button>
+
+              <div className="relative flex items-center my-4">
+                <div className="flex-grow border-t border-[#8C8579]/20"></div>
+                <span className="flex-shrink mx-4 text-xs text-[#8C8579] font-medium uppercase tracking-wider">
+                  or
+                </span>
+                <div className="flex-grow border-t border-[#8C8579]/20"></div>
+              </div>
+
+              <Button variant="secondary" className="gap-2 text-sm">
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  />
+                </svg>
+                Continue with Google
+              </Button>
+
+              <p className="text-center text-sm text-[#8C8579] mt-4">
+                Don't have an account?{" "}
+                <Link
+                  to="/select-account"
+                  className="text-[#7A2F2F] font-semibold hover:underline"
+                >
+                  Create Account
+                </Link>
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+export default LoginPage;
