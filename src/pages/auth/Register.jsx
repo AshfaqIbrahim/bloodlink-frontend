@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { registerUser } from "../../api/authApi";
+import { useNavigate, Link } from "react-router-dom";
+
 import {
   User,
   Mail,
@@ -150,9 +153,43 @@ function UserRegisterPage() {
     confirm: "",
   });
   const [agreed, setAgreed] = useState(false);
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!agreed) {
+      return alert("Please accept the Terms & Privacy Policy");
+    }
+
+    if (form.password !== form.confirm) {
+      return alert("Passwords do not match");
+    }
+
+    try {
+      const userData = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        bloodGroup: form.bloodGroup,
+        password: form.password,
+        confirmPassword: form.confirm,
+      };
+      const res = await registerUser(userData);
+      alert(res.data.message);
+
+      navigate("/login");
+    } catch (err) {
+      alert(err.response?.data?.message || "Registration failed");
+    }
+  };
+
   const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+  const navigate = useNavigate();
 
   return (
     <div className="h-screen flex items-center justify-center p-6 bg-[#F6F3EC] animate-fadeIn relative overflow-hidden">
@@ -238,7 +275,8 @@ function UserRegisterPage() {
             </div>
 
             {/* Form */}
-            <form onSubmit={(e) => e.preventDefault()}>
+            <form onSubmit={handleSubmit}>
+              {" "}
               {/* Name Fields */}
               <div className="grid grid-cols-2 gap-2">
                 <InputField
@@ -259,7 +297,6 @@ function UserRegisterPage() {
                   onChange={handleChange}
                 />
               </div>
-
               {/* Email */}
               <InputField
                 icon={Mail}
@@ -270,18 +307,16 @@ function UserRegisterPage() {
                 value={form.email}
                 onChange={handleChange}
               />
-
               {/* Phone */}
               <InputField
                 icon={Phone}
                 label="Phone Number"
                 type="tel"
-                placeholder="+91 00000-00000"
+                placeholder="00000-00000"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
               />
-
               {/* Blood Group Dropdown */}
               <SelectField
                 icon={Droplet}
@@ -291,7 +326,6 @@ function UserRegisterPage() {
                 value={form.bloodGroup}
                 onChange={handleChange}
               />
-
               {/* Password */}
               <InputField
                 icon={Lock}
@@ -310,7 +344,6 @@ function UserRegisterPage() {
                 }
                 onRightIconClick={() => setShowPassword(!showPassword)}
               />
-
               {/* Confirm Password */}
               <InputField
                 icon={Lock}
@@ -329,7 +362,6 @@ function UserRegisterPage() {
                 }
                 onRightIconClick={() => setShowConfirm(!showConfirm)}
               />
-
               {/* Checkbox */}
               <div className="mt-2 mb-3">
                 <Checkbox
@@ -338,19 +370,16 @@ function UserRegisterPage() {
                   onChange={() => setAgreed(!agreed)}
                 />
               </div>
-
               {/* CREATE ACCOUNT BUTTON */}
-              <Button>Create Account</Button>
-
-              {/* Login Link */}
+              <Button type="submit">Create Account</Button> {/* Login Link */}
               <p className="text-center text-xs text-[#8C8579] mt-3">
                 Already have an account?{" "}
-                <a
-                  href="#"
+                <Link
+                  to="/login"
                   className="text-[#7A2F2F] font-semibold hover:underline"
                 >
                   Login
-                </a>
+                </Link>
               </p>
             </form>
           </div>

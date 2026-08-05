@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Check } from "lucide-react";
-import { Link } from "react-router-dom";
+import { loginUser } from "../../api/authApi";
+import { Link, useNavigate } from "react-router-dom";
 
 const InputField = ({
   icon: Icon,
@@ -76,6 +77,25 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await loginUser({
+        email,
+        password,
+      });
+
+      alert(res.data.message);
+
+      navigate("/dashboard");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
+    }
+  };
 
   return (
     <div className="h-screen flex items-center justify-center p-6 bg-[#F6F3EC] animate-fadeIn relative overflow-hidden">
@@ -161,7 +181,8 @@ function LoginPage() {
               </p>
             </div>
 
-            <form onSubmit={(e) => e.preventDefault()}>
+            <form onSubmit={handleSubmit}>
+              {" "}
               <InputField
                 icon={Mail}
                 label="Email Address"
@@ -186,7 +207,6 @@ function LoginPage() {
                 }
                 onRightIconClick={() => setShowPassword(!showPassword)}
               />
-
               <div className="flex items-center justify-between mb-4">
                 <Checkbox
                   label="Remember Me"
@@ -200,9 +220,7 @@ function LoginPage() {
                   Forgot Password?
                 </Link>
               </div>
-
               <Button className="mb-4">Log In</Button>
-
               <div className="relative flex items-center my-4">
                 <div className="flex-grow border-t border-[#8C8579]/20"></div>
                 <span className="flex-shrink mx-4 text-xs text-[#8C8579] font-medium uppercase tracking-wider">
@@ -210,7 +228,6 @@ function LoginPage() {
                 </span>
                 <div className="flex-grow border-t border-[#8C8579]/20"></div>
               </div>
-
               <Button variant="secondary" className="gap-2 text-sm">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -232,7 +249,6 @@ function LoginPage() {
                 </svg>
                 Continue with Google
               </Button>
-
               <p className="text-center text-sm text-[#8C8579] mt-4">
                 Don't have an account?{" "}
                 <Link
