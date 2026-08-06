@@ -1,6 +1,3 @@
-// ============================================
-// FILE: src/components/landing/ContactSection.jsx
-// ============================================
 import React, { useState } from "react";
 import {
   Mail,

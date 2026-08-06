@@ -1,6 +1,3 @@
-// ============================================
-// FILE: src/components/landing/HowItWorks.jsx
-// ============================================
 import React from "react";
 import { User, Droplet, MapPin, Heart, ArrowRight } from "lucide-react";
 

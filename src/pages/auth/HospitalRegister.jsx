@@ -1,418 +1,417 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
-  Building,
   Mail,
   Phone,
+  Building2,
   MapPin,
-  User,
-  Shield,
   Lock,
   Eye,
   EyeOff,
   Check,
-  Zap,
-  Users,
   AlertCircle,
+  Activity,
+  Users,
+  Bell,
+  Shield,
+  Award,
+  ChevronDown,
+  Hospital,
+  User,
+  KeyRound,
+  Clipboard,
 } from "lucide-react";
 
-const InputField = ({
-  icon: Icon,
-  label,
-  type,
-  placeholder,
-  value,
-  onChange,
-  rightIcon,
-  onRightIconClick,
-  name,
-  optional = false,
-}) => (
-  <div className="mb-2">
-    <label className="block text-xs font-medium text-[#1C2321] mb-1">
-      {label}{" "}
-      {optional && (
-        <span className="text-[#8C8579] font-normal">(optional)</span>
-      )}
-    </label>
-    <div className="relative">
-      {Icon && (
-        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8C8579] w-4 h-4" />
-      )}
-      <input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="w-full h-11 pl-9 pr-8 rounded-xl border border-[#8C8579]/20 bg-white text-[#1C2321] placeholder:text-[#8C8579]/60 text-sm focus:outline-none focus:ring-2 focus:ring-[#7A2F2F] focus:border-transparent transition-all duration-200"
-      />
-      {rightIcon && (
-        <button
-          type="button"
-          onClick={onRightIconClick}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8C8579] hover:text-[#1C2321] transition-colors"
-        >
-          {rightIcon}
-        </button>
-      )}
-    </div>
-  </div>
-);
-
-const Button = ({ children, variant = "primary", className, ...props }) => {
-  const base =
-    "w-full h-11 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 text-sm";
-  const variants = {
-    primary:
-      "bg-[#7A2F2F] text-white hover:bg-[#631f1f] shadow-sm hover:shadow-md active:scale-[0.98]",
-  };
-  return (
-    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
-      {children}
-    </button>
-  );
-};
-
-const Checkbox = ({ label, checked, onChange }) => (
-  <label className="flex items-start gap-2 text-xs text-[#1C2321] cursor-pointer group">
-    <div className="relative flex items-center justify-center w-4 h-4 mt-0.5 flex-shrink-0">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={onChange}
-        className="peer appearance-none w-4 h-4 border border-[#8C8579]/40 rounded checked:border-[#7A2F2F] checked:bg-[#7A2F2F] transition-all duration-200 cursor-pointer"
-      />
-      <Check className="absolute text-white w-3 h-3 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-    </div>
-    <span className="select-none leading-relaxed">{label}</span>
-  </label>
-);
-
-const FeatureCard = ({ icon: Icon, title, description }) => (
-  <div className="flex items-start gap-3 p-2.5 rounded-xl bg-white/50 hover:bg-white transition-all duration-200">
-    <div className="w-8 h-8 rounded-xl bg-[#7A2F2F]/10 flex items-center justify-center flex-shrink-0">
-      <Icon className="w-4 h-4 text-[#7A2F2F]" />
+const FeatureCard = ({ icon: Icon, title, desc, delay = 0 }) => (
+  <motion.div
+    className="flex items-start gap-4 p-0"
+    initial={{ opacity: 0, x: -16 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ delay: 0.15 * (delay + 1), duration: 0.5, ease: "easeOut" }}
+  >
+    <div className="w-10 h-10 rounded-full bg-[#F8F4EC] flex items-center justify-center text-[#8B2E2E] shrink-0 mt-0.5">
+      <Icon size={20} strokeWidth={1.6} />
     </div>
     <div>
-      <h4 className="font-medium text-[#1C2321] text-xs">{title}</h4>
-      <p className="text-[#8C8579] text-[10px] leading-relaxed">
-        {description}
+      <h4 className="font-semibold text-[#2E2E2E] text-sm tracking-tight">
+        {title}
+      </h4>
+      <p className="text-[#7A7A7A] text-xs leading-relaxed mt-0.5 max-w-[220px]">
+        {desc}
       </p>
     </div>
-  </div>
+  </motion.div>
 );
 
-function HospitalRegisterPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+const StatItem = ({ value, label, delay = 0 }) => (
+  <motion.div
+    className="text-center"
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.6 + delay * 0.1, duration: 0.4 }}
+  >
+    <div className="text-xl font-bold text-[#2E2E2E] tracking-tight">
+      {value}
+    </div>
+    <div className="text-[#7A7A7A] text-[11px] font-medium uppercase tracking-wider mt-0.5">
+      {label}
+    </div>
+  </motion.div>
+);
+
+const HospitalRegistration = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     hospitalName: "",
     email: "",
     phone: "",
-    registrationNumber: "",
-    emergencyContact: "",
-    emergencyPhone: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
+    license: "",
+    district: "Kasaragod",
     password: "",
     confirm: "",
+    agree1: false,
+    agree2: false,
   });
-  const [certify, setCertify] = useState(false);
-  const [agree, setAgree] = useState(false);
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const districts = [
+    "Kasaragod",
+    "Kannur",
+    "Kozhikode",
+    "Malappuram",
+    "Wayanad",
+    "Palakkad",
+    "Thrissur",
+    "Ernakulam",
+    "Idukki",
+    "Kottayam",
+    "Alappuzha",
+    "Pathanamthitta",
+    "Kollam",
+    "Thiruvananthapuram",
+  ];
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle registration logic here
+    console.log("Form submitted:", form);
+    alert("Hospital account created successfully!");
+  };
+
+  const handleLoginClick = (e) => {
+    e.preventDefault();
+    navigate("/login");
+  };
 
   return (
-    <div className="h-screen flex items-center justify-center p-6 bg-[#F6F3EC] animate-fadeIn relative overflow-hidden">
-      <div className="absolute top-4 left-4 bg-[#7A2F2F]/10 text-[#7A2F2F] px-3 py-1 rounded-full text-xs font-medium border border-[#7A2F2F]/20 z-10">
-        Hospital Register Page
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-[#F8F4EC] p-4">
+      {/* Main card - split screen */}
+      <div className="w-full max-w-[1440px] bg-white rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col lg:flex-row min-h-[780px] relative">
+        {/* Floating medical illustrations background */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.04]">
+          <span className="absolute right-[-30px] bottom-[-40px] text-[18rem] rotate-[-8deg]">
+            🩸⚕️🏥
+          </span>
+          <span className="absolute left-[-20px] top-[20%] text-[10rem] rotate-[12deg]">
+            💉🧬
+          </span>
+        </div>
 
-      <div className="w-full max-w-[1300px] h-[95vh] max-h-[850px] grid grid-cols-1 lg:grid-cols-[38%_62%] bg-[#F6F3EC] rounded-3xl overflow-hidden shadow-2xl shadow-[#1C2321]/5">
-        {/* LEFT PANEL */}
-        <div className="p-10 lg:p-12 flex flex-col justify-center order-2 lg:order-1">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-9 h-9 bg-[#7A2F2F]/10 rounded-xl flex items-center justify-center">
-              <Building className="w-5 h-5 text-[#7A2F2F]" />
+        {/* ---------- LEFT SIDE (45%) ---------- */}
+        <div className="lg:w-[45%] w-full bg-[#F8F4EC] p-8 lg:p-12 flex flex-col relative z-10">
+          {/* Logo + Badge */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-[#8B2E2E] rounded-xl flex items-center justify-center text-white text-sm font-bold">
+                BL
+              </div>
+              <span className="text-[#2E2E2E] font-semibold text-lg tracking-tight">
+                BloodLink
+              </span>
             </div>
-            <span className="font-poppins font-bold text-xl text-[#1C2321]">
-              BloodLink
-            </span>
-            <span className="ml-1 text-[10px] font-medium text-[#8C8579] bg-[#8C8579]/10 px-2 py-0.5 rounded-full">
-              Hospitals
-            </span>
+            <div className="bg-[#D9C5A1] text-[#2E2E2E] px-3.5 py-1 rounded-full text-[0.7rem] font-semibold uppercase tracking-wide">
+              Verified Hospital Portal
+            </div>
           </div>
 
-          <div className="mb-4 flex justify-center">
-            <svg
-              className="w-full max-w-[190px]"
-              viewBox="0 0 240 120"
-              fill="none"
-            >
-              <rect
-                x="30"
-                y="45"
-                width="60"
-                height="55"
-                rx="3"
-                fill="#7A2F2F"
-                opacity="0.05"
-              />
-              <rect
-                x="35"
-                y="50"
-                width="50"
-                height="45"
-                rx="2"
-                fill="#7A2F2F"
-                opacity="0.06"
-              />
-              <rect
-                x="42"
-                y="57"
-                width="6"
-                height="8"
-                rx="1"
-                fill="#7A2F2F"
-                opacity="0.12"
-              />
-              <rect
-                x="52"
-                y="57"
-                width="6"
-                height="8"
-                rx="1"
-                fill="#7A2F2F"
-                opacity="0.12"
-              />
-              <rect
-                x="62"
-                y="57"
-                width="6"
-                height="8"
-                rx="1"
-                fill="#7A2F2F"
-                opacity="0.12"
-              />
-              <path
-                d="M100 75 C130 60, 150 75, 180 65"
-                stroke="#7A2F2F"
-                strokeWidth="1"
-                strokeDasharray="3 3"
-                opacity="0.25"
-              />
-              <circle cx="180" cy="62" r="8" fill="#7A2F2F" opacity="0.08" />
-              <circle cx="180" cy="62" r="3" fill="#7A2F2F" opacity="0.3" />
-              <circle cx="200" cy="52" r="7" fill="#3F6B5C" opacity="0.08" />
-              <circle cx="200" cy="52" r="3" fill="#3F6B5C" opacity="0.3" />
-            </svg>
-          </div>
+          {/* Heading */}
+          <motion.h1
+            className="text-3xl lg:text-4xl font-bold text-[#2E2E2E] leading-tight mt-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+          >
+            Partner with <span className="text-[#8B2E2E]">BloodLink</span>
+          </motion.h1>
+          <motion.p
+            className="text-[#7A7A7A] text-sm mt-3 max-w-md leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
+          >
+            Join Kerala's growing emergency blood donation network. Create
+            verified emergency requests, instantly reach nearby donors, and save
+            lives faster.
+          </motion.p>
 
-          <h1 className="font-poppins font-bold text-3xl lg:text-4xl leading-tight text-[#1C2321] mb-2">
-            Partner With BloodLink
-          </h1>
-          <p className="text-sm text-[#5a554a] max-w-md leading-relaxed mb-4">
-            Register your hospital to create emergency blood requests, connect
-            with nearby verified donors, and save lives through real-time
-            intelligent matching.
-          </p>
-
-          <div className="space-y-2 max-w-sm">
+          {/* Feature Cards */}
+          <div className="mt-8 space-y-5">
             <FeatureCard
-              icon={Zap}
-              title="Real-time Blood Requests"
-              description="Create and manage emergency blood requests instantly."
+              icon={Activity}
+              title="Real-Time Emergency Requests"
+              desc="Create and manage emergency blood requests in seconds."
+              delay={0}
             />
             <FeatureCard
               icon={Users}
-              title="Intelligent Nearby Donor Matching"
-              description="Connect with compatible blood donors in your area."
+              title="Verified Donor Network"
+              desc="Instantly connect with nearby verified blood donors."
+              delay={1}
             />
             <FeatureCard
-              icon={AlertCircle}
-              title="Instant Emergency Notifications"
-              description="Receive real-time alerts when donors respond."
+              icon={Bell}
+              title="Instant Notifications"
+              desc="Receive donor responses and request updates in real time."
+              delay={2}
             />
+          </div>
+
+          {/* Statistics */}
+          <div className="mt-auto pt-10 flex flex-wrap gap-8 border-t border-[#D9C5A1]/30">
+            <StatItem value="250+" label="Verified Hospitals" delay={0} />
+            <StatItem value="12K+" label="Registered Donors" delay={1} />
+            <StatItem value="24/7" label="Emergency Support" delay={2} />
           </div>
         </div>
 
-        {/* RIGHT PANEL - Removed overflow constraints */}
-        <div className="p-6 lg:p-8 flex items-center justify-center order-1 lg:order-2 bg-[#FCFBF8] lg:bg-transparent">
-          <div className="w-full max-w-lg bg-[#FCFBF8] rounded-3xl p-8 shadow-xl shadow-[#1C2321]/5 animate-slideUp">
-            <div className="mb-4">
-              <div className="flex items-center gap-2.5 mb-1">
-                <div className="w-8 h-8 bg-[#7A2F2F]/10 rounded-xl flex items-center justify-center">
-                  <Building className="w-4 h-4 text-[#7A2F2F]" />
-                </div>
-                <span className="font-poppins font-bold text-xl text-[#1C2321]">
-                  BloodLink
-                </span>
+        {/* ---------- RIGHT SIDE (55%) ---------- */}
+        <div className="lg:w-[55%] w-full bg-white p-6 lg:p-10 flex flex-col">
+          <div className="max-w-md mx-auto w-full">
+            {/* Logo inside card */}
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-7 h-7 bg-[#8B2E2E] rounded-lg flex items-center justify-center text-white text-[10px] font-bold">
+                BL
               </div>
-              <h2 className="font-poppins font-semibold text-xl text-[#1C2321]">
-                Hospital Registration
-              </h2>
-              <p className="text-[#8C8579] text-sm">
-                Create your hospital account to start managing emergency blood
-                requests.
-              </p>
+              <span className="text-[#2E2E2E] font-semibold text-md tracking-tight">
+                BloodLink
+              </span>
             </div>
 
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-1">
-              <div className="grid grid-cols-2 gap-2.5">
-                <InputField
-                  icon={Building}
-                  label="Hospital Name"
-                  type="text"
-                  placeholder="City Hospital"
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.5 }}
+            >
+              <h2 className="text-2xl font-bold text-[#2E2E2E]">
+                Create Hospital Account
+              </h2>
+              <p className="text-[#7A7A7A] text-sm mt-1 mb-6">
+                Register your hospital to request emergency blood donations and
+                join the BloodLink healthcare network.
+              </p>
+            </motion.div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Hospital Name */}
+              <div>
+                <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
+                  Hospital Name *
+                </label>
+                <input
                   name="hospitalName"
                   value={form.hospitalName}
                   onChange={handleChange}
-                />
-                <InputField
-                  icon={Mail}
-                  label="Official Email"
-                  type="email"
-                  placeholder="admin@hospital.com"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <InputField
-                  icon={Phone}
-                  label="Phone Number"
-                  type="tel"
-                  placeholder="+1 (555) 000-0000"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                />
-                <InputField
-                  icon={Shield}
-                  label="Registration Number"
-                  type="text"
-                  placeholder="Optional ID"
-                  name="registrationNumber"
-                  value={form.registrationNumber}
-                  onChange={handleChange}
-                  optional
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <InputField
-                  icon={User}
-                  label="Emergency Contact"
-                  type="text"
-                  placeholder="Dr. Smith"
-                  name="emergencyContact"
-                  value={form.emergencyContact}
-                  onChange={handleChange}
-                />
-                <InputField
-                  icon={Phone}
-                  label="Emergency Number"
-                  type="tel"
-                  placeholder="+1 (555) 000-0000"
-                  name="emergencyPhone"
-                  value={form.emergencyPhone}
-                  onChange={handleChange}
-                />
-              </div>
-              <InputField
-                icon={MapPin}
-                label="Street Address"
-                type="text"
-                placeholder="123 Healthcare Blvd"
-                name="address"
-                value={form.address}
-                onChange={handleChange}
-              />
-              <div className="grid grid-cols-3 gap-2.5">
-                <InputField
-                  label="City"
-                  type="text"
-                  placeholder="New York"
-                  name="city"
-                  value={form.city}
-                  onChange={handleChange}
-                />
-                <InputField
-                  label="State"
-                  type="text"
-                  placeholder="NY"
-                  name="state"
-                  value={form.state}
-                  onChange={handleChange}
-                />
-                <InputField
-                  label="Pincode"
-                  type="text"
-                  placeholder="10001"
-                  name="pincode"
-                  value={form.pincode}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <InputField
-                  icon={Lock}
-                  label="Password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  rightIcon={
-                    showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )
-                  }
-                  onRightIconClick={() => setShowPassword(!showPassword)}
-                />
-                <InputField
-                  icon={Lock}
-                  label="Confirm Password"
-                  type={showConfirm ? "text" : "password"}
-                  placeholder="••••••••"
-                  name="confirm"
-                  value={form.confirm}
-                  onChange={handleChange}
-                  rightIcon={
-                    showConfirm ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )
-                  }
-                  onRightIconClick={() => setShowConfirm(!showConfirm)}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all bg-white"
+                  placeholder="e.g. KIMS Hospital"
+                  required
                 />
               </div>
 
-              <div className="space-y-1.5 mt-2">
-                <Checkbox
-                  label="I certify that this information is accurate."
-                  checked={certify}
-                  onChange={() => setCertify(!certify)}
-                />
-                <Checkbox
-                  label="I agree to the Terms & Privacy Policy."
-                  checked={agree}
-                  onChange={() => setAgree(!agree)}
+              {/* Email + Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
+                    Official Email *
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all"
+                    placeholder="hospital@mail.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
+                    Hospital Phone *
+                  </label>
+                  <input
+                    name="phone"
+                    type="tel"
+                    value={form.phone}
+                    onChange={handleChange}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all"
+                    placeholder="+91 12345 67890"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* License + District */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
+                    Hospital License Number *
+                  </label>
+                  <input
+                    name="license"
+                    value={form.license}
+                    onChange={handleChange}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all"
+                    placeholder="License ID"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
+                    District *
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="district"
+                      value={form.district}
+                      onChange={handleChange}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm appearance-none bg-white focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all pr-9"
+                    >
+                      {districts.map((d) => (
+                        <option key={d}>{d}</option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size={16}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7A7A7A] pointer-events-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* State - Prefilled */}
+              <div>
+                <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
+                  State
+                </label>
+                <input
+                  value="Kerala"
+                  disabled
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-[#7A7A7A] cursor-not-allowed"
                 />
               </div>
 
-              <Button className="mt-3">Register Hospital</Button>
+              {/* Password + Confirm */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="relative">
+                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
+                    Password *
+                  </label>
+                  <input
+                    name="password"
+                    type={showPass ? "text" : "password"}
+                    value={form.password}
+                    onChange={handleChange}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all pr-9"
+                    required
+                  />
+                  <div
+                    className="absolute right-3 top-[34px] cursor-pointer text-[#7A7A7A]"
+                    onClick={() => setShowPass(!showPass)}
+                  >
+                    {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </div>
+                </div>
+                <div className="relative">
+                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
+                    Confirm Password *
+                  </label>
+                  <input
+                    name="confirm"
+                    type={showConfirm ? "text" : "password"}
+                    value={form.confirm}
+                    onChange={handleChange}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all pr-9"
+                    required
+                  />
+                  <div
+                    className="absolute right-3 top-[34px] cursor-pointer text-[#7A7A7A]"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                  >
+                    {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </div>
+                </div>
+              </div>
 
-              <p className="text-center text-xs text-[#8C8579] mt-3">
-                Already registered?{" "}
+              {/* Checkboxes - Added more spacing above */}
+              <div className="space-y-2 pt-4 mt-2">
+                <label className="flex items-start gap-2 text-sm text-[#2E2E2E]">
+                  <input
+                    type="checkbox"
+                    name="agree1"
+                    checked={form.agree1}
+                    onChange={handleChange}
+                    className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[#8B2E2E] focus:ring-[#8B2E2E]/30"
+                  />
+                  <span>
+                    I certify that the information provided is accurate.
+                  </span>
+                </label>
+                <label className="flex items-start gap-2 text-sm text-[#2E2E2E]">
+                  <input
+                    type="checkbox"
+                    name="agree2"
+                    checked={form.agree2}
+                    onChange={handleChange}
+                    className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[#8B2E2E] focus:ring-[#8B2E2E]/30"
+                  />
+                  <span>
+                    I agree to the{" "}
+                    <span className="text-[#8B2E2E] font-medium">Terms</span>{" "}
+                    &amp;{" "}
+                    <span className="text-[#8B2E2E] font-medium">
+                      Privacy Policy
+                    </span>
+                    .
+                  </span>
+                </label>
+              </div>
+
+              {/* Submit Button */}
+              <motion.button
+                type="submit"
+                className="w-full bg-[#8B2E2E] text-white font-semibold py-3.5 rounded-2xl text-sm transition-colors hover:bg-[#742626] mt-4"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
+                Create Hospital Account
+              </motion.button>
+
+              {/* Bottom Text with Login Link */}
+              <p className="text-center text-sm text-[#7A7A7A] mt-4">
+                Already have an account?{" "}
                 <a
                   href="#"
-                  className="text-[#7A2F2F] font-semibold hover:underline"
+                  onClick={handleLoginClick}
+                  className="text-[#8B2E2E] font-semibold hover:underline transition-colors"
                 >
                   Login
                 </a>
@@ -423,6 +422,6 @@ function HospitalRegisterPage() {
       </div>
     </div>
   );
-}
+};
 
-export default HospitalRegisterPage;
+export default HospitalRegistration;

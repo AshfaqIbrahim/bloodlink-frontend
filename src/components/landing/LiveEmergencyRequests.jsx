@@ -9,9 +9,7 @@ import {
   Heart,
 } from "lucide-react";
 
-// ============================================
 // DATA
-// ============================================
 const requests = [
   {
     id: 1,
@@ -75,10 +73,7 @@ const requests = [
   },
 ];
 
-// ============================================
 // COMPONENTS
-// ============================================
-
 const UrgencyBadge = ({ urgency }) => {
   const colors = {
     Critical: "text-[#C23B22] bg-[#C23B22]/10",
@@ -169,9 +164,7 @@ const RequestCard = ({ request, index }) => {
   );
 };
 
-// ============================================
 // MAIN COMPONENT
-// ============================================
 const LiveEmergencyRequests = () => {
   return (
     <section className="w-full bg-[#F6F3EC] py-12 md:py-16 px-4 sm:px-6 lg:px-8">
