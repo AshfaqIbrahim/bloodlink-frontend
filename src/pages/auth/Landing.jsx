@@ -4,6 +4,7 @@ import StatsSection from "../../components/landing/StatsSection";
 import HowItWorks from "../../components/landing/HowItWorks";
 import LiveEmergencyRequests from "../../components/landing/LiveEmergencyRequests";
 import FeaturesSection from "../../components/landing/FeaturesSection";
+import AboutSection from "../../components/landing/AboutSection";
 
 function Landing() {
   return (
@@ -14,6 +15,7 @@ function Landing() {
       <HowItWorks />
       <LiveEmergencyRequests />
       <FeaturesSection />
+      <AboutSection />
     </>
   );
 }
