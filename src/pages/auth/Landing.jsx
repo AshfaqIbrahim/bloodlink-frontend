@@ -5,6 +5,8 @@ import HowItWorks from "../../components/landing/HowItWorks";
 import LiveEmergencyRequests from "../../components/landing/LiveEmergencyRequests";
 import FeaturesSection from "../../components/landing/FeaturesSection";
 import AboutSection from "../../components/landing/AboutSection";
+import TestimonialsSection from "../../components/landing/TestimonialsSection";
+import FAQSection from "../../components/landing/FAQSection";
 
 function Landing() {
   return (
@@ -16,6 +18,8 @@ function Landing() {
       <LiveEmergencyRequests />
       <FeaturesSection />
       <AboutSection />
+      <TestimonialsSection />
+      <FAQSection />
     </>
   );
 }
