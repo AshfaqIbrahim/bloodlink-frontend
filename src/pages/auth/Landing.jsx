@@ -8,6 +8,8 @@ import AboutSection from "../../components/landing/AboutSection";
 import TestimonialsSection from "../../components/landing/TestimonialsSection";
 import FAQSection from "../../components/landing/FAQSection";
 import ContactSection from "../../components/landing/ContactSection";
+import CTASection from "../../components/landing/CTASection";
+import Footer from "../../components/common/Footer";
 
 function Landing() {
   return (
@@ -22,6 +24,8 @@ function Landing() {
       <TestimonialsSection />
       <FAQSection />
       <ContactSection />
+      <CTASection />
+      <Footer />
     </>
   );
 }
