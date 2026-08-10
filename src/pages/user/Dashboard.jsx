@@ -3,15 +3,17 @@ import WelcomeSection from "../../components/user/WelcomeSection";
 import QuickStats from "../../components/user/QuickStats";
 import AvailabilitySection from "../../components/user/AvailabilitySection";
 import NearbyRequestsPreview from "../../components/user/NearbyRequestsPreview";
+import Footer from "../../components/common/Footer";
 
 function Dashboard() {
   return (
-    <div>
+    <main className="bg-[#F6F3EC] min-h-screen">
       <WelcomeSection />
       <QuickStats />
       <AvailabilitySection />
       <NearbyRequestsPreview />
-    </div>
+      <Footer />
+    </main>
   );
 }
 
