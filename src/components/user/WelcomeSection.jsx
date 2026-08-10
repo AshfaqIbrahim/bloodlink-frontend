@@ -78,10 +78,6 @@ const WelcomeSection = () => {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 animate-fadeIn">
               <button className="flex-1 bg-[#7A2F2F] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#631f1f] transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2">
-                <Heart className="w-4 h-4" />
-                Become Available
-              </button>
-              <button className="flex-1 bg-white text-[#1C2321] px-6 py-3 rounded-xl font-medium border border-[#8C8579]/30 hover:border-[#8C8579]/60 hover:bg-[#F6F3EC]/50 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Find Nearby Requests
               </button>

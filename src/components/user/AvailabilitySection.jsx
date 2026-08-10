@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getMe } from "../../api/authApi";
+import { updateAvailability } from "../../api/userApi";
+
 import {
   Clock,
   Calendar,
@@ -10,10 +13,38 @@ import {
 } from "lucide-react";
 
 const AvailabilitySection = () => {
-  const [isAvailable, setIsAvailable] = useState(true);
+  const [isAvailable, setIsAvailable] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
-  const toggleAvailability = () => {
-    setIsAvailable(!isAvailable);
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await getMe();
+        setIsAvailable(response.data.user.isAvailable);
+      } catch (error) {
+        console.error("Failed to fetch availability:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const toggleAvailability = async () => {
+    try {
+      setUpdating(true);
+
+      const newStatus = !isAvailable;
+      const response = await updateAvailability(newStatus);
+
+      setIsAvailable(response.data.user.isAvailable);
+    } catch (error) {
+      console.error("Failed to update availability:", error);
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const infoCards = [
@@ -83,6 +114,7 @@ const AvailabilitySection = () => {
               {/* Toggle Switch */}
               <button
                 onClick={toggleAvailability}
+                disabled={updating}
                 className={`relative w-16 h-9 rounded-full transition-all duration-300 flex-shrink-0 shadow-sm hover:shadow-md ${
                   isAvailable ? "bg-[#7A2F2F]" : "bg-[#8C8579]/40"
                 }`}
