@@ -1,17 +1,36 @@
-import React from "react";
-import {
-  User,
-  Droplet,
-  Clock,
-  Shield,
-  Award,
-  TrendingUp,
-  Calendar,
-  MapPin,
-  Heart,
-} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { getMe } from "../../api/authApi";
+import { User, Droplet, Clock, MapPin, Heart, Calendar } from "lucide-react";
 
 const WelcomeSection = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await getMe();
+
+        setUser(response.data.user);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  //temp==========
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <div>Unable to load user</div>;
+  }
+  //===============
+
   // Get current date
   const today = new Date();
   const options = {
@@ -28,17 +47,6 @@ const WelcomeSection = () => {
   if (hour >= 12 && hour < 17) greeting = "Good Afternoon";
   else if (hour >= 17) greeting = "Good Evening";
 
-  // Placeholder user data
-  const user = {
-    name: "Ashfaq",
-    bloodGroup: "O+",
-    availability: "Available",
-    memberSince: "Jan 2024",
-    reliabilityScore: 96,
-    donationLevel: "Silver Donor",
-    donations: 12,
-  };
-
   return (
     <section className="w-full bg-[#F6F3EC] p-4 md:p-6 lg:p-8 animate-fadeIn">
       <div className="max-w-7xl mx-auto">
@@ -48,7 +56,7 @@ const WelcomeSection = () => {
             {/* Greeting */}
             <div className="animate-slideUp">
               <h1 className="font-poppins font-bold text-3xl md:text-4xl lg:text-5xl text-[#1C2321] leading-tight">
-                {greeting}, {user.name} 👋
+                {greeting}, {user.firstName} 👋
               </h1>
               <p className="text-[#8C8579] text-sm md:text-base mt-2 flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
@@ -90,7 +98,7 @@ const WelcomeSection = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-poppins font-semibold text-lg text-[#1C2321] truncate">
-                    {user.name}
+                    {user.firstName}
                   </h3>
                   <div className="flex flex-wrap gap-2 mt-1">
                     <span className="inline-flex items-center gap-1 text-xs font-medium bg-[#7A2F2F]/10 text-[#7A2F2F] px-2.5 py-0.5 rounded-full">
@@ -99,7 +107,7 @@ const WelcomeSection = () => {
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs font-medium bg-[#3F6B5C]/10 text-[#3F6B5C] px-2.5 py-0.5 rounded-full">
                       <Clock className="w-3 h-3" />
-                      {user.availability}
+                      {user.isAvailable ? "Available" : "Unavailable"}
                     </span>
                   </div>
                 </div>
@@ -108,25 +116,35 @@ const WelcomeSection = () => {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-[#F6F3EC] rounded-xl p-3 text-center">
-                  <p className="text-[#8C8579] text-xs font-medium">
-                    Member Since
-                  </p>
+                  <p className="text-[#8C8579] text-xs font-medium">Email</p>
                   <p className="text-[#1C2321] text-sm font-semibold mt-0.5">
-                    {user.memberSince}
+                    {user.email}
+                  </p>
+                </div>
+                <div className="bg-[#F6F3EC] rounded-xl p-3 text-center">
+                  <p className="text-[#8C8579] text-xs font-medium">Phone</p>
+                  <p className="text-[#1C2321] text-sm font-semibold mt-0.5">
+                    {user.phone}
                   </p>
                 </div>
                 <div className="bg-[#F6F3EC] rounded-xl p-3 text-center">
                   <p className="text-[#8C8579] text-xs font-medium">
-                    Donations
+                    Blood Group
                   </p>
                   <p className="text-[#1C2321] text-sm font-semibold mt-0.5">
-                    {user.donations}
+                    {user.bloodGroup}
+                  </p>
+                </div>
+                <div className="bg-[#F6F3EC] rounded-xl p-3 text-center">
+                  <p className="text-[#8C8579] text-xs font-medium">Role</p>
+                  <p className="text-[#1C2321] text-sm font-semibold mt-0.5">
+                    {user.role}
                   </p>
                 </div>
               </div>
 
               {/* Reliability Score */}
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-[#1C2321] flex items-center gap-2">
                     <Shield className="w-4 h-4 text-[#7A2F2F]" />
@@ -142,10 +160,10 @@ const WelcomeSection = () => {
                     style={{ width: `${user.reliabilityScore}%` }}
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* Donation Level */}
-              <div className="flex items-center justify-between p-3 bg-[#7A2F2F]/5 rounded-xl mb-4">
+              {/* <div className="flex items-center justify-between p-3 bg-[#7A2F2F]/5 rounded-xl mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-[#7A2F2F]/10 rounded-xl flex items-center justify-center">
                     <Award className="w-5 h-5 text-[#7A2F2F]" />
@@ -157,8 +175,8 @@ const WelcomeSection = () => {
                     </p>
                   </div>
                 </div>
-                <TrendingUp className="w-5 h-5 text-[#3F6B5C]" />
-              </div>
+                <TrendingUp className="w-5 h-5 text-[#3F6B5C]" /> */}
+              {/* </div> */}
 
               {/* Inspirational Quote */}
               <div className="border-t border-[#8C8579]/10 pt-4">

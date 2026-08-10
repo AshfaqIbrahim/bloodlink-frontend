@@ -102,7 +102,7 @@ function LoginPage() {
         });
 
         alert(res.data.message);
-        navigate("/dashboard");
+        navigate("/user/dashboard");
       }
     } catch (err) {
       alert(err.response?.data?.message || "Login failed. Please try again.");
