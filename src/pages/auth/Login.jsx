@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Check } from "lucide-react";
-import { loginUser } from "../../api/authApi";
 import { Link, useNavigate } from "react-router-dom";
+import { loginUser } from "../../api/authApi";
+import { loginHospital } from "../../api/hospitalApi";
 
 const InputField = ({
   icon: Icon,
@@ -77,6 +78,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [loginType, setLoginType] = useState("user");
 
   const navigate = useNavigate();
 
@@ -84,16 +86,26 @@ function LoginPage() {
     e.preventDefault();
 
     try {
-      const res = await loginUser({
-        email,
-        password,
-      });
+      let res;
+      if (loginType === "hospital") {
+        res = await loginHospital({
+          email,
+          password,
+        });
 
-      alert(res.data.message);
+        alert(res.data.message);
+        navigate("/hospital-dashboard");
+      } else {
+        res = await loginUser({
+          email,
+          password,
+        });
 
-      navigate("/dashboard");
+        alert(res.data.message);
+        navigate("/dashboard");
+      }
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      alert(err.response?.data?.message || "Login failed. Please try again.");
     }
   };
 
@@ -173,9 +185,45 @@ function LoginPage() {
                   BloodLink
                 </span>
               </div>
-              <h2 className="font-poppins font-semibold text-2xl text-[#1C2321]">
-                Welcome Back
-              </h2>
+
+              <p className="text-[#8C8579] text-sm">
+                {loginType === "hospital"
+                  ? "Login to your hospital account to manage emergency blood requests."
+                  : "Login to your account to continue."}
+              </p>
+
+              <div className="mb-6">
+                <p className="text-sm font-medium text-[#1C2321] mb-2">
+                  Login as
+                </p>
+
+                <div className="grid grid-cols-2 gap-2 p-1 bg-[#F6F3EC] rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setLoginType("user")}
+                    className={`py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      loginType === "user"
+                        ? "bg-white text-[#7A2F2F] shadow-sm"
+                        : "text-[#8C8579] hover:text-[#1C2321]"
+                    }`}
+                  >
+                    Donor / Recipient
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setLoginType("hospital")}
+                    className={`py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      loginType === "hospital"
+                        ? "bg-white text-[#7A2F2F] shadow-sm"
+                        : "text-[#8C8579] hover:text-[#1C2321]"
+                    }`}
+                  >
+                    Hospital
+                  </button>
+                </div>
+              </div>
+
               <p className="text-[#8C8579] text-sm">
                 Login to your account to continue.
               </p>
@@ -220,7 +268,9 @@ function LoginPage() {
                   Forgot Password?
                 </Link>
               </div>
-              <Button className="mb-4">Log In</Button>
+              <Button className="mb-4">
+                {loginType === "hospital" ? "Hospital Login" : "Log In"}
+              </Button>{" "}
               <div className="relative flex items-center my-4">
                 <div className="flex-grow border-t border-[#8C8579]/20"></div>
                 <span className="flex-shrink mx-4 text-xs text-[#8C8579] font-medium uppercase tracking-wider">

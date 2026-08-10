@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { registerHospital } from "../../api/hospitalApi";
 import {
   Mail,
   Phone,
@@ -101,11 +102,41 @@ const HospitalRegistration = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle registration logic here
-    console.log("Form submitted:", form);
-    alert("Hospital account created successfully!");
+
+    if (!form.agree1 || !form.agree2) {
+      alert("Please accept the required agreements");
+      return;
+    }
+    if (form.password !== form.confirm) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await registerHospital({
+        hospitalName: form.hospitalName,
+        email: form.email,
+        phone: form.phone,
+        licenseNumber: form.license,
+        district: form.district,
+        password: form.password,
+        confirmPassword: form.confirm,
+      });
+
+      console.log("Hospital registration:", response.data);
+      alert("Hospital account created successfully!");
+
+      navigate("/login");
+    } catch (error) {
+      console.error("Hospital registration error:", error);
+
+      alert(
+        error.response?.data?.message ||
+          "Hospital registration failed. Please try again.",
+      );
+    }
   };
 
   const handleLoginClick = (e) => {
