@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Heart,
-  Droplet,
-  MapPin,
-  Star,
-  TrendingUp,
-  Users,
-  Clock,
-} from "lucide-react";
+import { Heart, Droplet, Star, TrendingUp } from "lucide-react";
 
 const QuickStats = () => {
   const stats = [

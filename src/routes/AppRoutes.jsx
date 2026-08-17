@@ -9,6 +9,12 @@ import Landing from "../pages/auth/Landing";
 
 //User Pages
 import UserDashboard from "../pages/user/Dashboard";
+import RequestDetails from "../pages/user/RequestDetails";
+import ViewAllRequests from "../pages/user/ViewAllRequests";
+import HelpSupport from "../pages/user/HelpSupport";
+import ContactUs from "../pages/user/ContactUs";
+import CreateRequest from "../pages/user/CreateRequest";
+import MyRequests from "../pages/user/MyRequest";
 
 function AppRoutes() {
   return (
@@ -22,6 +28,12 @@ function AppRoutes() {
 
       {/* User Routes */}
       <Route path="/user/dashboard" element={<UserDashboard />} />
+      <Route path="/user/request/:id" element={<RequestDetails />} />
+      <Route path="/user/emergency-requests" element={<ViewAllRequests />} />
+      <Route path="/help" element={<HelpSupport />} />
+      <Route path="/contact" element={<ContactUs />} />
+      <Route path="/user/create-request" element={<CreateRequest />} />
+      <Route path="/user/my-requests" element={<MyRequests />} />
     </Routes>
   );
 }

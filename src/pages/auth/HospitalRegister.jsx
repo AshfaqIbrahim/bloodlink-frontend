@@ -255,15 +255,12 @@ const HospitalRegistration = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Hospital Name */}
               <div>
-                <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
-                  Hospital Name *
-                </label>
                 <input
                   name="hospitalName"
                   value={form.hospitalName}
                   onChange={handleChange}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all bg-white"
-                  placeholder="e.g. KIMS Hospital"
+                  placeholder="Hospital Name"
                   required
                 />
               </div>
@@ -271,30 +268,24 @@ const HospitalRegistration = () => {
               {/* Email + Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
-                    Official Email *
-                  </label>
                   <input
                     name="email"
                     type="email"
                     value={form.email}
                     onChange={handleChange}
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all"
-                    placeholder="hospital@mail.com"
+                    placeholder="Official Email"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
-                    Hospital Phone *
-                  </label>
                   <input
                     name="phone"
                     type="tel"
                     value={form.phone}
                     onChange={handleChange}
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all"
-                    placeholder="+91 12345 67890"
+                    placeholder="Hospital Phone"
                     required
                   />
                 </div>
@@ -303,22 +294,16 @@ const HospitalRegistration = () => {
               {/* License + District */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
-                    Hospital License Number *
-                  </label>
                   <input
                     name="license"
                     value={form.license}
                     onChange={handleChange}
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all"
-                    placeholder="License ID"
+                    placeholder="Hospital License Number"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
-                    District *
-                  </label>
                   <div className="relative">
                     <select
                       name="district"
@@ -340,51 +325,45 @@ const HospitalRegistration = () => {
 
               {/* State - Prefilled */}
               <div>
-                <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
-                  State
-                </label>
                 <input
                   value="Kerala"
                   disabled
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 text-[#7A7A7A] cursor-not-allowed"
+                  placeholder="State"
                 />
               </div>
 
               {/* Password + Confirm */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="relative">
-                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
-                    Password *
-                  </label>
                   <input
                     name="password"
                     type={showPass ? "text" : "password"}
                     value={form.password}
                     onChange={handleChange}
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all pr-9"
+                    placeholder="Password"
                     required
                   />
                   <div
-                    className="absolute right-3 top-[34px] cursor-pointer text-[#7A7A7A]"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#7A7A7A]"
                     onClick={() => setShowPass(!showPass)}
                   >
                     {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
                   </div>
                 </div>
                 <div className="relative">
-                  <label className="block text-xs font-medium text-[#2E2E2E] mb-1">
-                    Confirm Password *
-                  </label>
                   <input
                     name="confirm"
                     type={showConfirm ? "text" : "password"}
                     value={form.confirm}
                     onChange={handleChange}
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B2E2E] focus:shadow-[0_0_0_3px_rgba(139,46,46,0.12)] transition-all pr-9"
+                    placeholder="Confirm Password"
                     required
                   />
                   <div
-                    className="absolute right-3 top-[34px] cursor-pointer text-[#7A7A7A]"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#7A7A7A]"
                     onClick={() => setShowConfirm(!showConfirm)}
                   >
                     {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}

@@ -48,7 +48,10 @@ const WelcomeSection = () => {
   else if (hour >= 17) greeting = "Good Evening";
 
   return (
-    <section className="w-full bg-[#F6F3EC] p-4 md:p-6 lg:p-8 animate-fadeIn">
+    <section
+      id="welcome"
+      className="scroll-mt-20 w-full bg-[#F6F3EC] p-4 md:p-6 lg:p-8 animate-fadeIn"
+    >
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {/* LEFT SIDE - Greeting & Content */}

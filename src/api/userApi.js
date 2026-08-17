@@ -5,3 +5,9 @@ export const updateAvailability = (isAvailable) => {
     isAvailable,
   });
 };
+
+export const getAvailableDonors = async () => {
+  const response = await api.get("/user/available-donors");
+
+  return response.data;
+};

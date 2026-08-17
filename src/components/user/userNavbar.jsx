@@ -1,3 +1,4 @@
+// src/components/layout/UserNavbar.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -11,9 +12,10 @@ import {
   X,
   Droplet,
   Heart,
+  Users,
 } from "lucide-react";
 
-const UserNavbar = ({ user }) => {
+const UserNavbar = ({ user, role, setRole }) => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -60,19 +62,25 @@ const UserNavbar = ({ user }) => {
     navigate("/login");
   };
 
-  const navLinks = [
-    { to: "/user/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    {
-      to: "/user/emergency-requests",
-      label: "Emergency Requests",
-      icon: AlertCircle,
-    },
-    { to: "/user/activity", label: "My Activity", icon: History },
-  ];
+  const handleRoleChange = (newRole) => {
+    setRole(newRole);
+    setIsMobileMenuOpen(false);
+  };
 
   const mobileNavLinks = [
-    ...navLinks,
-    { to: "/user/profile", label: "Profile", icon: User },
+    {
+      label: "Donor",
+      icon: Heart,
+      isRole: true,
+      value: "donor",
+    },
+    {
+      label: "Recipient",
+      icon: Users,
+      isRole: true,
+      value: "recipient",
+    },
+    { to: "/user/profile", label: "Profile", icon: User, isRole: false },
   ];
 
   return (
@@ -89,24 +97,30 @@ const UserNavbar = ({ user }) => {
             </span>
           </div>
 
-          {/* Center - Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? "text-[#7A2F2F] bg-[#7A2F2F]/10"
-                      : "text-[#8C8579] hover:text-[#1C2321] hover:bg-gray-100/80"
-                  }`
-                }
-              >
-                <link.icon size={18} strokeWidth={1.8} />
-                <span>{link.label}</span>
-              </NavLink>
-            ))}
+          {/* Center - Desktop Navigation - Donor/Recipient Toggle */}
+          <div className="hidden md:flex items-center gap-1 bg-[#F6F3EC] p-1 rounded-xl">
+            <button
+              onClick={() => handleRoleChange("donor")}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                role === "donor"
+                  ? "text-[#7A2F2F] bg-[#FCFBF8] shadow-sm"
+                  : "text-[#8C8579] hover:text-[#1C2321] hover:bg-gray-100/50"
+              }`}
+            >
+              <Heart size={18} strokeWidth={1.8} />
+              <span>Donor</span>
+            </button>
+            <button
+              onClick={() => handleRoleChange("recipient")}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                role === "recipient"
+                  ? "text-[#7A2F2F] bg-[#FCFBF8] shadow-sm"
+                  : "text-[#8C8579] hover:text-[#1C2321] hover:bg-gray-100/50"
+              }`}
+            >
+              <Users size={18} strokeWidth={1.8} />
+              <span>Recipient</span>
+            </button>
           </div>
 
           {/* Right - Notifications + Profile */}
@@ -229,23 +243,47 @@ const UserNavbar = ({ user }) => {
           className="absolute top-[68px] left-0 right-0 bg-[#FCFBF8] border-b border-gray-200/60 shadow-lg md:hidden animate-in slide-in-from-top-2 duration-200"
         >
           <div className="px-4 py-3 space-y-1">
-            {mobileNavLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? "text-[#7A2F2F] bg-[#7A2F2F]/10"
-                      : "text-[#8C8579] hover:text-[#1C2321] hover:bg-gray-100/80"
-                  }`
-                }
-                onClick={() => setIsMobileMenuOpen(false)}
+            {/* Donor/Recipient toggle in mobile */}
+            <div className="grid grid-cols-2 gap-2 bg-[#F6F3EC] p-1 rounded-xl mb-2">
+              <button
+                onClick={() => handleRoleChange("donor")}
+                className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  role === "donor"
+                    ? "text-[#7A2F2F] bg-[#FCFBF8] shadow-sm"
+                    : "text-[#8C8579] hover:text-[#1C2321]"
+                }`}
               >
-                <link.icon size={18} strokeWidth={1.8} />
-                <span>{link.label}</span>
-              </NavLink>
-            ))}
+                <Heart size={18} strokeWidth={1.8} />
+                <span>Donor</span>
+              </button>
+              <button
+                onClick={() => handleRoleChange("recipient")}
+                className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  role === "recipient"
+                    ? "text-[#7A2F2F] bg-[#FCFBF8] shadow-sm"
+                    : "text-[#8C8579] hover:text-[#1C2321]"
+                }`}
+              >
+                <Users size={18} strokeWidth={1.8} />
+                <span>Recipient</span>
+              </button>
+            </div>
+
+            {/* Profile link */}
+            <NavLink
+              to="/user/profile"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? "text-[#7A2F2F] bg-[#7A2F2F]/10"
+                    : "text-[#8C8579] hover:text-[#1C2321] hover:bg-gray-100/80"
+                }`
+              }
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <User size={18} strokeWidth={1.8} />
+              <span>Profile</span>
+            </NavLink>
 
             <div className="border-t border-gray-200/60 my-2 pt-2">
               <button

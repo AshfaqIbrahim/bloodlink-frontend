@@ -28,9 +28,6 @@ const InputField = ({
   name,
 }) => (
   <div className="mb-2">
-    <label className="block text-xs font-medium text-[#1C2321] mb-1">
-      {label}
-    </label>
     <div className="relative">
       {Icon && (
         <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8C8579] w-4 h-4" />
@@ -58,9 +55,6 @@ const InputField = ({
 
 const SelectField = ({ icon: Icon, label, options, value, onChange, name }) => (
   <div className="mb-2">
-    <label className="block text-xs font-medium text-[#1C2321] mb-1">
-      {label}
-    </label>
     <div className="relative">
       {Icon && (
         <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8C8579] w-4 h-4" />
@@ -276,14 +270,13 @@ function UserRegisterPage() {
 
             {/* Form */}
             <form onSubmit={handleSubmit}>
-              {" "}
               {/* Name Fields */}
               <div className="grid grid-cols-2 gap-2">
                 <InputField
                   icon={User}
                   label="First Name"
                   type="text"
-                  placeholder="John"
+                  placeholder="First Name"
                   name="firstName"
                   value={form.firstName}
                   onChange={handleChange}
@@ -291,7 +284,7 @@ function UserRegisterPage() {
                 <InputField
                   label="Last Name"
                   type="text"
-                  placeholder="Doe"
+                  placeholder="Last Name"
                   name="lastName"
                   value={form.lastName}
                   onChange={handleChange}
@@ -302,7 +295,7 @@ function UserRegisterPage() {
                 icon={Mail}
                 label="Email Address"
                 type="email"
-                placeholder="name@example.com"
+                placeholder="Email Address"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
@@ -312,7 +305,7 @@ function UserRegisterPage() {
                 icon={Phone}
                 label="Phone Number"
                 type="tel"
-                placeholder="00000-00000"
+                placeholder="Phone Number"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
@@ -331,7 +324,7 @@ function UserRegisterPage() {
                 icon={Lock}
                 label="Password"
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Password"
                 name="password"
                 value={form.password}
                 onChange={handleChange}
@@ -349,7 +342,7 @@ function UserRegisterPage() {
                 icon={Lock}
                 label="Confirm Password"
                 type={showConfirm ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Confirm Password"
                 name="confirm"
                 value={form.confirm}
                 onChange={handleChange}
@@ -371,7 +364,8 @@ function UserRegisterPage() {
                 />
               </div>
               {/* CREATE ACCOUNT BUTTON */}
-              <Button type="submit">Create Account</Button> {/* Login Link */}
+              <Button type="submit">Create Account</Button>
+              {/* Login Link */}
               <p className="text-center text-xs text-[#8C8579] mt-3">
                 Already have an account?{" "}
                 <Link

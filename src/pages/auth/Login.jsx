@@ -15,9 +15,6 @@ const InputField = ({
   onRightIconClick,
 }) => (
   <div className="mb-4">
-    <label className="block text-sm font-medium text-[#1C2321] mb-1.5">
-      {label}
-    </label>
     <div className="relative">
       {Icon && (
         <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8C8579] w-5 h-5" />
@@ -230,12 +227,11 @@ function LoginPage() {
             </div>
 
             <form onSubmit={handleSubmit}>
-              {" "}
               <InputField
                 icon={Mail}
                 label="Email Address"
                 type="email"
-                placeholder="name@example.com"
+                placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -243,7 +239,7 @@ function LoginPage() {
                 icon={Lock}
                 label="Password"
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 rightIcon={
@@ -270,7 +266,7 @@ function LoginPage() {
               </div>
               <Button className="mb-4">
                 {loginType === "hospital" ? "Hospital Login" : "Log In"}
-              </Button>{" "}
+              </Button>
               <div className="relative flex items-center my-4">
                 <div className="flex-grow border-t border-[#8C8579]/20"></div>
                 <span className="flex-shrink mx-4 text-xs text-[#8C8579] font-medium uppercase tracking-wider">

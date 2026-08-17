@@ -137,7 +137,7 @@ const AvailabilitySection = () => {
             contact you during emergencies.
           </p>
 
-          {/* Information Grid - 4 Cards */}
+          {/* Information Grid - 4 Cards
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {infoCards.map((card, index) => (
               <div
@@ -162,7 +162,7 @@ const AvailabilitySection = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* Footer Info Card */}
           <div className="flex items-start gap-4 p-5 bg-[#7A2F2F]/5 rounded-2xl border border-[#7A2F2F]/10 hover:bg-[#7A2F2F]/8 transition-all duration-300">
