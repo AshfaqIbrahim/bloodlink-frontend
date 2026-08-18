@@ -1,111 +1,103 @@
 // src/pages/user/MyRequests.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Droplet,
-  Droplets,
   MapPin,
   Clock,
-  AlertTriangle,
-  Calendar,
   Plus,
   ChevronRight,
-  Eye,
   Search,
+  AlertCircle,
+  Loader,
 } from "lucide-react";
+import {
+  getMyEmergencyRequests,
+  cancelEmergencyRequest,
+} from "../../api/emergencyRequestApi";
 
 const MyRequests = () => {
   const navigate = useNavigate();
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
 
-  const [requests] = useState([
-    {
-      id: 1,
-      bloodGroup: "O+",
-      unitsRequired: 2,
-      urgency: "Critical",
-      location: "Mangalore",
-      district: "Kasaragod",
-      requiredBy: "2026-08-17T20:00:00",
-      createdAt: "2026-08-16T14:30:00",
-      status: "Active",
-      description: "Emergency surgery required",
-    },
-    {
-      id: 2,
-      bloodGroup: "A+",
-      unitsRequired: 1,
-      urgency: "Urgent",
-      location: "Kasaragod",
-      district: "Kasaragod",
-      requiredBy: "2026-08-18T10:00:00",
-      createdAt: "2026-08-15T09:15:00",
-      status: "Fulfilled",
-      description: "Blood required for delivery",
-    },
-    {
-      id: 3,
-      bloodGroup: "B+",
-      unitsRequired: 3,
-      urgency: "Normal",
-      location: "Kanhangad",
-      district: "Kasaragod",
-      requiredBy: "2026-08-20T14:30:00",
-      createdAt: "2026-08-14T16:45:00",
-      status: "Cancelled",
-      description: "Scheduled surgery",
-    },
-    {
-      id: 4,
-      bloodGroup: "AB-",
-      unitsRequired: 1,
-      urgency: "Critical",
-      location: "Mangalore",
-      district: "Kasaragod",
-      requiredBy: "2026-08-15T18:00:00",
-      createdAt: "2026-08-13T11:00:00",
-      status: "Expired",
-      description: "Emergency accident case",
-    },
-  ]);
+  useEffect(() => {
+    fetchRequests();
+  }, []);
 
+  const fetchRequests = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await getMyEmergencyRequests();
+      setRequests(res.data.requests || []);
+    } catch (err) {
+      console.error("Error fetching my requests:", err);
+      setError("Unable to load your requests.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = async (id) => {
+    if (!window.confirm("Cancel this request?")) return;
+
+    setCancellingId(id);
+    try {
+      await cancelEmergencyRequest(id);
+      setRequests((prev) =>
+        prev.map((r) => (r._id === id ? { ...r, status: "cancelled" } : r)),
+      );
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to cancel request.");
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
+  // Backend statuses are lowercase: active, fulfilled, cancelled, expired
   const getStatusConfig = (status) => {
     const configs = {
-      Active: {
+      active: {
         label: "Searching for Donors",
         color: "#C23B22",
         bgColor: "bg-[#C23B22]/10",
         borderColor: "border-[#C23B22]/20",
       },
-      Fulfilled: {
+      fulfilled: {
         label: "Fulfilled",
         color: "#3F6B5C",
         bgColor: "bg-[#3F6B5C]/10",
         borderColor: "border-[#3F6B5C]/20",
       },
-      Cancelled: {
+      cancelled: {
         label: "Cancelled",
         color: "#8C8579",
         bgColor: "bg-[#8C8579]/10",
         borderColor: "border-[#8C8579]/20",
       },
-      Expired: {
+      expired: {
         label: "Expired",
         color: "#8C8579",
         bgColor: "bg-[#8C8579]/10",
         borderColor: "border-[#8C8579]/20",
       },
     };
-    return configs[status] || configs["Active"];
+    return configs[status] || configs.active;
   };
 
+  // Backend urgencies are lowercase: critical, urgent, normal
   const getUrgencyColor = (urgency) => {
     const colors = {
-      Critical: "#C23B22",
-      Urgent: "#7A2F2F",
-      Normal: "#3F6B5C",
+      critical: "#C23B22",
+      urgent: "#7A2F2F",
+      normal: "#3F6B5C",
     };
     return colors[urgency] || "#7A2F2F";
   };
+
+  const capitalize = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -148,7 +140,6 @@ const MyRequests = () => {
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8">
-
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -160,11 +151,46 @@ const MyRequests = () => {
               Track the blood requests you have created.
             </p>
           </div>
+          {requests.length > 0 && (
+            <button
+              onClick={handleCreateRequest}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#7A2F2F] text-white rounded-xl hover:bg-[#631F1F] transition-colors duration-200 shadow-sm hover:shadow-md text-sm font-medium"
+            >
+              <Plus size={18} />
+              Create Request
+            </button>
+          )}
         </div>
 
-        {/* Requests List */}
-        {requests.length === 0 ? (
-          // Empty State
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="text-center">
+              <Loader
+                size={36}
+                className="text-[#7A2F2F] animate-spin mx-auto mb-3"
+              />
+              <p className="text-[#8C8579]">Loading your requests...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {!loading && error && (
+          <div className="bg-[#FCFBF8] rounded-2xl p-8 text-center border border-gray-200/60">
+            <AlertCircle size={40} className="text-[#C23B22] mx-auto mb-3" />
+            <p className="text-[#1C2321] font-medium">{error}</p>
+            <button
+              onClick={fetchRequests}
+              className="mt-3 px-6 py-2 bg-[#7A2F2F] text-white rounded-xl hover:bg-[#631F1F] transition-colors duration-200 text-sm"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && requests.length === 0 && (
           <div className="bg-[#FCFBF8] rounded-3xl shadow-sm border border-gray-200/60 p-12 text-center">
             <div className="max-w-sm mx-auto">
               <div className="w-20 h-20 bg-[#7A2F2F]/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -185,8 +211,10 @@ const MyRequests = () => {
               </button>
             </div>
           </div>
-        ) : (
-          // Requests Grid
+        )}
+
+        {/* Requests Grid */}
+        {!loading && !error && requests.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {requests.map((request) => {
               const urgencyColor = getUrgencyColor(request.urgency);
@@ -194,7 +222,7 @@ const MyRequests = () => {
 
               return (
                 <div
-                  key={request.id}
+                  key={request._id}
                   className="bg-[#FCFBF8] rounded-2xl shadow-sm border border-gray-200/60 p-5 hover:shadow-md transition-shadow duration-200"
                 >
                   {/* Header: Blood Group + Status */}
@@ -229,7 +257,7 @@ const MyRequests = () => {
                             className="text-xs font-medium"
                             style={{ color: urgencyColor }}
                           >
-                            {request.urgency}
+                            {capitalize(request.urgency)}
                           </span>
                         </div>
                       </div>
@@ -254,9 +282,11 @@ const MyRequests = () => {
                   <div className="flex items-center gap-2 text-sm text-[#8C8579] mb-2">
                     <Clock size={15} className="text-[#7A2F2F] flex-shrink-0" />
                     <span>Required by: {formatDate(request.requiredBy)}</span>
-                    <span className="text-xs text-[#3F6B5C] bg-[#3F6B5C]/10 px-2 py-0.5 rounded-full">
-                      {getTimeRemaining(request.requiredBy)}
-                    </span>
+                    {request.status === "active" && (
+                      <span className="text-xs text-[#3F6B5C] bg-[#3F6B5C]/10 px-2 py-0.5 rounded-full">
+                        {getTimeRemaining(request.requiredBy)}
+                      </span>
+                    )}
                   </div>
 
                   {/* Description */}
@@ -266,17 +296,31 @@ const MyRequests = () => {
                     </p>
                   )}
 
-                  {/* View Details Button */}
-                  <button
-                    onClick={() => handleViewDetails(request.id)}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-[#7A2F2F] hover:text-[#631F1F] transition-colors duration-200 group"
-                  >
-                    View Details
-                    <ChevronRight
-                      size={16}
-                      className="group-hover:translate-x-0.5 transition-transform duration-200"
-                    />
-                  </button>
+                  {/* Actions */}
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => handleViewDetails(request._id)}
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-[#7A2F2F] hover:text-[#631F1F] transition-colors duration-200 group"
+                    >
+                      View Details
+                      <ChevronRight
+                        size={16}
+                        className="group-hover:translate-x-0.5 transition-transform duration-200"
+                      />
+                    </button>
+
+                    {request.status === "active" && (
+                      <button
+                        onClick={() => handleCancel(request._id)}
+                        disabled={cancellingId === request._id}
+                        className="text-sm font-medium text-[#8C8579] hover:text-[#C23B22] transition-colors duration-200 disabled:opacity-60"
+                      >
+                        {cancellingId === request._id
+                          ? "Cancelling..."
+                          : "Cancel"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               );
             })}

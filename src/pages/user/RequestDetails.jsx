@@ -5,13 +5,14 @@ import {
   ArrowLeft,
   Droplet,
   Hospital,
+  User,
   MapPin,
   Calendar,
   Clock,
   AlertCircle,
   Loader,
 } from "lucide-react";
-import axios from "axios";
+import { getPublicEmergencyRequestById } from "../../api/emergencyRequestApi";
 
 const RequestDetails = () => {
   const { id } = useParams();
@@ -25,10 +26,7 @@ const RequestDetails = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get(
-          `http://localhost:5000/api/emergency-requests/public/${id}`,
-          { withCredentials: true },
-        );
+        const response = await getPublicEmergencyRequestById(id);
         setRequest(response.data.request);
       } catch (err) {
         console.error("Error fetching request details:", err);
@@ -106,26 +104,28 @@ const RequestDetails = () => {
     });
   };
 
-  // Get urgency styles
+  // Get urgency styles (backend urgencies are lowercase)
   const getUrgencyStyles = (urgency) => {
     const styles = {
-      Critical: "bg-[#C23B22]/10 text-[#C23B22]",
-      Urgent: "bg-[#7A2F2F]/10 text-[#7A2F2F]",
-      Normal: "bg-[#3F6B5C]/10 text-[#3F6B5C]",
+      critical: "bg-[#C23B22]/10 text-[#C23B22]",
+      urgent: "bg-[#7A2F2F]/10 text-[#7A2F2F]",
+      normal: "bg-[#3F6B5C]/10 text-[#3F6B5C]",
     };
-    return styles[urgency] || styles.Normal;
+    return styles[urgency] || styles.normal;
   };
 
-  // Get status styles
+  // Get status styles (backend statuses are lowercase)
   const getStatusStyles = (status) => {
     const styles = {
-      Active: "bg-[#3F6B5C]/10 text-[#3F6B5C]",
-      Fulfilled: "bg-[#3F6B5C]/10 text-[#3F6B5C]",
-      Cancelled: "bg-[#C23B22]/10 text-[#C23B22]",
-      Expired: "bg-[#C23B22]/10 text-[#C23B22]",
+      active: "bg-[#3F6B5C]/10 text-[#3F6B5C]",
+      fulfilled: "bg-[#3F6B5C]/10 text-[#3F6B5C]",
+      cancelled: "bg-[#C23B22]/10 text-[#C23B22]",
+      expired: "bg-[#C23B22]/10 text-[#C23B22]",
     };
-    return styles[status] || styles.Active;
+    return styles[status] || styles.active;
   };
+
+  const capitalize = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
   return (
     <div className="min-h-screen bg-[#F6F3EC] py-6 px-4 sm:px-6 lg:px-8">
@@ -171,12 +171,28 @@ const RequestDetails = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${getUrgencyStyles(request.urgency)}`}
                   >
-                    {request.urgency}
+                    {capitalize(request.urgency)}
                   </span>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyles(request.status)}`}
                   >
-                    {request.status}
+                    {capitalize(request.status)}
+                  </span>
+                  <span
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
+                      request.requesterType === "hospital"
+                        ? "bg-[#3F6B5C]/10 text-[#3F6B5C]"
+                        : "bg-[#7A2F2F]/10 text-[#7A2F2F]"
+                    }`}
+                  >
+                    {request.requesterType === "hospital" ? (
+                      <Hospital size={12} />
+                    ) : (
+                      <User size={12} />
+                    )}
+                    {request.requesterType === "hospital"
+                      ? "Hospital Request"
+                      : "Individual Request"}
                   </span>
                 </div>
               </div>
@@ -207,26 +223,47 @@ const RequestDetails = () => {
             </div>
           </div>
 
-          {/* Hospital Information */}
+          {/* Requester Information */}
           <div className="mt-8 pt-6 border-t border-gray-200/60">
             <h3 className="text-sm font-medium text-[#8C8579] uppercase tracking-wider mb-4">
-              Hospital Information
+              {request.requesterType === "hospital"
+                ? "Hospital Information"
+                : "Requested By"}
             </h3>
             <div className="flex items-start gap-4">
               <div className="p-2 bg-[#7A2F2F]/5 rounded-xl flex-shrink-0">
-                <Hospital size={20} className="text-[#7A2F2F]" />
+                {request.requesterType === "hospital" ? (
+                  <Hospital size={20} className="text-[#7A2F2F]" />
+                ) : (
+                  <User size={20} className="text-[#7A2F2F]" />
+                )}
               </div>
               <div>
-                <p className="font-semibold text-[#1C2321]">
-                  {request.hospital?.hospitalName ||
-                    "Hospital Name Not Available"}
-                </p>
-                <p className="text-[#8C8579] text-sm mt-0.5">
-                  {request.hospital?.district ||
-                    request.district ||
-                    "Location not specified"}
-                  {request.hospital?.state && `, ${request.hospital.state}`}
-                </p>
+                {request.requesterType === "hospital" ? (
+                  <>
+                    <p className="font-semibold text-[#1C2321]">
+                      {request.hospital?.hospitalName ||
+                        "Hospital Name Not Available"}
+                    </p>
+                    <p className="text-[#8C8579] text-sm mt-0.5">
+                      {request.hospital?.district ||
+                        request.district ||
+                        "Location not specified"}
+                      {request.hospital?.state && `, ${request.hospital.state}`}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold text-[#1C2321]">
+                      {request.requestedByUser
+                        ? `${request.requestedByUser.firstName || ""} ${request.requestedByUser.lastName || ""}`.trim()
+                        : "Requester Not Available"}
+                    </p>
+                    <p className="text-[#8C8579] text-sm mt-0.5">
+                      {request.requestedByUser?.phone || "Phone not shared"}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -258,9 +295,9 @@ const RequestDetails = () => {
               <div>
                 <p className="text-sm text-[#8C8579]">Urgency</p>
                 <p
-                  className={`font-medium ${request.urgency === "Critical" ? "text-[#C23B22]" : request.urgency === "Urgent" ? "text-[#7A2F2F]" : "text-[#3F6B5C]"}`}
+                  className={`font-medium ${request.urgency === "critical" ? "text-[#C23B22]" : request.urgency === "urgent" ? "text-[#7A2F2F]" : "text-[#3F6B5C]"}`}
                 >
-                  {request.urgency}
+                  {capitalize(request.urgency)}
                 </p>
               </div>
             </div>

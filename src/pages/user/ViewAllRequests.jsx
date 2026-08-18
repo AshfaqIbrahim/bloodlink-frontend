@@ -6,15 +6,12 @@ import {
   MapPin,
   Clock,
   Droplet,
+  Hospital,
+  User,
   AlertCircle,
   ChevronRight,
 } from "lucide-react";
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-  withCredentials: true,
-});
+import { getNearbyEmergencyRequests } from "../../api/emergencyRequestApi";
 
 const ViewAllRequests = () => {
   const navigate = useNavigate();
@@ -30,7 +27,7 @@ const ViewAllRequests = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get("/emergency-requests/nearby");
+      const response = await getNearbyEmergencyRequests();
       setRequests(response.data.requests || []);
     } catch (err) {
       console.error("Error fetching emergency requests:", err);
@@ -48,13 +45,27 @@ const ViewAllRequests = () => {
     navigate(`/user/request/${requestId}`);
   };
 
+  // Backend urgencies are lowercase: critical, urgent, normal
   const getUrgencyColors = (urgency) => {
     const colors = {
-      Critical: "bg-[#C23B22]/10 text-[#C23B22] border-[#C23B22]/20",
-      Urgent: "bg-[#7A2F2F]/10 text-[#7A2F2F] border-[#7A2F2F]/20",
-      Normal: "bg-[#3F6B5C]/10 text-[#3F6B5C] border-[#3F6B5C]/20",
+      critical: "bg-[#C23B22]/10 text-[#C23B22] border-[#C23B22]/20",
+      urgent: "bg-[#7A2F2F]/10 text-[#7A2F2F] border-[#7A2F2F]/20",
+      normal: "bg-[#3F6B5C]/10 text-[#3F6B5C] border-[#3F6B5C]/20",
     };
-    return colors[urgency] || colors.Normal;
+    return colors[urgency] || colors.normal;
+  };
+
+  const capitalize = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
+  const getRequesterName = (request) => {
+    if (request.requesterType === "hospital") {
+      return request.hospital?.hospitalName || "Hospital Name Not Available";
+    }
+    if (request.requestedByUser) {
+      const { firstName, lastName } = request.requestedByUser;
+      return `${firstName || ""} ${lastName || ""}`.trim() || "Requester";
+    }
+    return "Requester Not Available";
   };
 
   const formatDate = (dateString) => {
@@ -153,7 +164,7 @@ const ViewAllRequests = () => {
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${getUrgencyColors(request.urgency)}`}
                         >
-                          {request.urgency}
+                          {capitalize(request.urgency)}
                         </span>
                         <span className="text-xs text-[#8C8579]">
                           {request.unitsRequired} unit
@@ -168,11 +179,28 @@ const ViewAllRequests = () => {
                   </div>
                 </div>
 
-                {/* Hospital & Location */}
+                {/* Requester & Location */}
                 <div className="mb-2">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                        request.requesterType === "hospital"
+                          ? "bg-[#3F6B5C]/10 text-[#3F6B5C]"
+                          : "bg-[#7A2F2F]/10 text-[#7A2F2F]"
+                      }`}
+                    >
+                      {request.requesterType === "hospital" ? (
+                        <Hospital className="w-3 h-3" />
+                      ) : (
+                        <User className="w-3 h-3" />
+                      )}
+                      {request.requesterType === "hospital"
+                        ? "Hospital"
+                        : "Individual"}
+                    </span>
+                  </div>
                   <h3 className="font-semibold text-[#1C2321]">
-                    {request.hospital?.hospitalName ||
-                      "Hospital Name Not Available"}
+                    {getRequesterName(request)}
                   </h3>
                   <p className="text-sm text-[#8C8579]">
                     {request.patientName || "Patient name not specified"}

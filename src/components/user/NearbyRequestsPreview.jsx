@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
   Droplets,
   AlertCircle,
   Hospital,
+  User,
   MapPin,
   Clock,
   ChevronRight,
   ArrowRight,
 } from "lucide-react";
+import { getNearbyEmergencyRequests } from "../../api/emergencyRequestApi";
 
 const NearbyRequestsPreview = () => {
   const [requests, setRequests] = useState([]);
@@ -20,12 +21,7 @@ const NearbyRequestsPreview = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/emergency-requests/nearby",
-          {
-            withCredentials: true,
-          },
-        );
+        const response = await getNearbyEmergencyRequests();
 
         // Get only the 3 most recent requests
         const allRequests = response.data.requests || [];
@@ -61,6 +57,39 @@ const NearbyRequestsPreview = () => {
           style={{ backgroundColor: color }}
         />
         {urgency}
+      </span>
+    );
+  };
+
+  const getRequesterName = (request) => {
+    if (request.requesterType === "hospital") {
+      return request.hospital?.hospitalName || "Hospital";
+    }
+    if (request.requestedByUser) {
+      const { firstName, lastName } = request.requestedByUser;
+      return (
+        `${firstName || ""} ${lastName || ""}`.trim() || "Individual Requester"
+      );
+    }
+    return "Individual Requester";
+  };
+
+  const RequesterBadge = ({ request }) => {
+    const isHospital = request.requesterType === "hospital";
+    return (
+      <span
+        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
+          isHospital
+            ? "bg-[#3F6B5C]/10 text-[#3F6B5C]"
+            : "bg-[#7A2F2F]/10 text-[#7A2F2F]"
+        }`}
+      >
+        {isHospital ? (
+          <Hospital className="w-3 h-3" />
+        ) : (
+          <User className="w-3 h-3" />
+        )}
+        {isHospital ? "Hospital" : "Individual"}
       </span>
     );
   };
@@ -134,9 +163,9 @@ const NearbyRequestsPreview = () => {
                       {/* Hospital Info */}
                       <div className="space-y-1.5">
                         <div className="flex items-center gap-2">
-                          <Hospital className="w-4 h-4 text-[#8C8579] flex-shrink-0" />
+                          <RequesterBadge request={request} />
                           <span className="text-sm font-medium text-[#1C2321]">
-                            {request.hospital?.hospitalName}
+                            {getRequesterName(request)}
                           </span>
                         </div>
 
