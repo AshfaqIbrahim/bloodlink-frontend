@@ -6,6 +6,7 @@ import Register from "../pages/auth/Register";
 import HospitalRegister from "../pages/auth/HospitalRegister";
 import SelectAccount from "../pages/auth/SelectAccount";
 import Landing from "../pages/auth/Landing";
+import GoogleCompleteRegistration from "../pages/auth/GoogleCompleteRegistration";
 
 //User Pages
 import UserDashboard from "../pages/user/Dashboard";
@@ -25,6 +26,10 @@ function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/hospital-register" element={<HospitalRegister />} />
       <Route path="/select-account" element={<SelectAccount />} />
+      <Route
+        path="/google-complete-registration"
+        element={<GoogleCompleteRegistration />}
+      />
 
       {/* User Routes */}
       <Route path="/user/dashboard" element={<UserDashboard />} />

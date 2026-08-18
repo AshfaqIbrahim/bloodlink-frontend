@@ -15,3 +15,13 @@ export const getMe = () => {
     withCredentials: true,
   });
 };
+
+export const googleLogin = (credential) => {
+  return api.post("/auth/google", {
+    credential,
+  });
+};
+
+export const completeGoogleRegistration = (data) => {
+  return api.post("/auth/google/complete-registration", data);
+};
