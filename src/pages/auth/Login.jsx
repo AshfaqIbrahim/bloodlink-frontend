@@ -102,9 +102,19 @@ function LoginPage() {
         });
 
         alert(res.data.message);
-        navigate("/user/dashboard");
+
+        if (res.data.user?.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/user/dashboard");
+        }
       }
     } catch (err) {
+      if (err.response?.data?.notVerified) {
+        alert(err.response.data.message);
+        navigate("/verify-otp", { state: { email } });
+        return;
+      }
       alert(err.response?.data?.message || "Login failed. Please try again.");
     }
   };

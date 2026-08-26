@@ -7,6 +7,7 @@ import HospitalRegister from "../pages/auth/HospitalRegister";
 import SelectAccount from "../pages/auth/SelectAccount";
 import Landing from "../pages/auth/Landing";
 import GoogleCompleteRegistration from "../pages/auth/GoogleCompleteRegistration";
+import VerifyOtp from "../pages/auth/VerifyOtp";
 
 //User Pages
 import UserDashboard from "../pages/user/Dashboard";
@@ -17,6 +18,13 @@ import ContactUs from "../pages/user/ContactUs";
 import CreateRequest from "../pages/user/CreateRequest";
 import MyRequests from "../pages/user/MyRequest";
 
+//Admin Pages
+import AdminDashboard from "../pages/admin/Dashboard";
+import AdminHospitals from "../pages/admin/Hospitals";
+import AdminUsers from "../pages/admin/Users";
+import AdminRequests from "../pages/admin/Requests";
+import ProtectedAdminRoute from "../components/admin/ProtectedAdminRoute";
+
 function AppRoutes() {
   return (
     <Routes>
@@ -24,6 +32,7 @@ function AppRoutes() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/verify-otp" element={<VerifyOtp />} />
       <Route path="/hospital-register" element={<HospitalRegister />} />
       <Route path="/select-account" element={<SelectAccount />} />
       <Route
@@ -39,6 +48,40 @@ function AppRoutes() {
       <Route path="/contact" element={<ContactUs />} />
       <Route path="/user/create-request" element={<CreateRequest />} />
       <Route path="/user/my-requests" element={<MyRequests />} />
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedAdminRoute>
+            <AdminDashboard />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/hospitals"
+        element={
+          <ProtectedAdminRoute>
+            <AdminHospitals />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedAdminRoute>
+            <AdminUsers />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/requests"
+        element={
+          <ProtectedAdminRoute>
+            <AdminRequests />
+          </ProtectedAdminRoute>
+        }
+      />
     </Routes>
   );
 }

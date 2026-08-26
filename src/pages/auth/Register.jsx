@@ -175,7 +175,7 @@ function UserRegisterPage() {
       const res = await registerUser(userData);
       alert(res.data.message);
 
-      navigate("/login");
+      navigate("/verify-otp", { state: { email: form.email } });
     } catch (err) {
       alert(err.response?.data?.message || "Registration failed");
     }
