@@ -11,3 +11,7 @@ export const getAvailableDonors = async () => {
 
   return response.data;
 };
+
+export const updateProfile = (data) => {
+  return api.patch("/user/profile", data);
+};

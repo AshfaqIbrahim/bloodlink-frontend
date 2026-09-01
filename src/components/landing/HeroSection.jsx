@@ -1,8 +1,9 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Heart, Check, ArrowRight, Shield, Clock, MapPin } from "lucide-react";
 import Button from "../common/Button";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <section className="min-h-[70vh] flex items-center pt-16 bg-[#F6F3EC] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
@@ -27,8 +28,7 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-wrap gap-4 mb-6">
-              <Button size="lg">Get Started</Button>
-              <Button variant="secondary" size="lg">
+              <Button size="lg" onClick={() => navigate("/register")}>
                 Become a Donor
               </Button>
             </div>

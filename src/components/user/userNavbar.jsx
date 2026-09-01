@@ -1,4 +1,3 @@
-// src/components/layout/UserNavbar.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -14,21 +13,33 @@ import {
   Heart,
   Users,
 } from "lucide-react";
+import { getMe, logoutUser } from "../../api/authApi";
 
-const UserNavbar = ({ user, role, setRole }) => {
+const UserNavbar = ({ role, setRole }) => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userData, setUserData] = useState(null);
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
-  // Mock user data - replace with actual user from context/props
-  const userData = user || {
-    name: "Ibrahim",
-    email: "ibrahim@hospital.com",
-    bloodGroup: "B+",
-    availability: "Available",
-  };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getMe();
+        const u = res.data.user;
+        setUserData({
+          name: `${u.firstName || ""} ${u.lastName || ""}`.trim(),
+          email: u.email,
+          bloodGroup: u.bloodGroup,
+          availability: u.isAvailable ? "Available" : "Unavailable",
+        });
+      } catch (err) {
+        console.error("Failed to load user info:", err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -55,11 +66,14 @@ const UserNavbar = ({ user, role, setRole }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    // Call your existing logout API here
-    // Example: await logout();
-    console.log("Logging out...");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      navigate("/login");
+    }
   };
 
   const handleRoleChange = (newRole) => {
@@ -139,20 +153,20 @@ const UserNavbar = ({ user, role, setRole }) => {
               >
                 <div className="w-8 h-8 rounded-full bg-[#7A2F2F]/10 flex items-center justify-center">
                   <span className="text-[#7A2F2F] font-medium text-sm">
-                    {userData.name.charAt(0)}
+                    {userData?.name?.charAt(0) || "U"}
                   </span>
                 </div>
                 <div className="hidden sm:block text-left">
                   <div className="text-sm font-medium text-[#1C2321] leading-tight">
-                    {userData.name}
+                    {userData?.name || "Loading..."}
                   </div>
                   <div className="flex items-center gap-2 text-xs">
                     <span className="text-[#7A2F2F] font-medium">
-                      {userData.bloodGroup}
+                      {userData?.bloodGroup || "--"}
                     </span>
                     <span className="w-1 h-1 rounded-full bg-[#8C8579]"></span>
                     <span className="text-[#3F6B5C]">
-                      {userData.availability}
+                      {userData?.availability || "--"}
                     </span>
                   </div>
                 </div>
@@ -166,23 +180,23 @@ const UserNavbar = ({ user, role, setRole }) => {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-[#7A2F2F]/10 flex items-center justify-center">
                         <span className="text-[#7A2F2F] font-medium text-base">
-                          {userData.name.charAt(0)}
+                          {userData?.name?.charAt(0) || "U"}
                         </span>
                       </div>
                       <div>
                         <div className="font-medium text-[#1C2321]">
-                          {userData.name}
+                          {userData?.name || "Loading..."}
                         </div>
                         <div className="text-sm text-[#8C8579]">
-                          {userData.email}
+                          {userData?.email || ""}
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-xs font-medium text-[#7A2F2F]">
-                            {userData.bloodGroup}
+                            {userData?.bloodGroup || "--"}
                           </span>
                           <span className="w-1 h-1 rounded-full bg-[#8C8579]"></span>
                           <span className="text-xs text-[#3F6B5C]">
-                            {userData.availability}
+                            {userData?.availability || "--"}
                           </span>
                         </div>
                       </div>

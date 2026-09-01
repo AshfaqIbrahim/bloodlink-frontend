@@ -1,8 +1,10 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, Heart } from "lucide-react";
 import Button from "../common/Button";
 
 const CTASection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-20 bg-[#7A2F2F] relative overflow-hidden">
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#7A2F2F]/0 to-white/5" />
@@ -27,6 +29,7 @@ const CTASection = () => {
           <Button
             variant="secondary"
             size="lg"
+            onClick={() => navigate("/register")}
             className="bg-white text-[#7A2F2F] hover:bg-white/90 shadow-lg shadow-[#1C2321]/20"
           >
             Register Now <ArrowRight className="w-4 h-4" />

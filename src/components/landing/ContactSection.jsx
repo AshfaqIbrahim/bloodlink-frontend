@@ -36,13 +36,13 @@ const ContactSection = () => {
     {
       icon: Mail,
       label: "Email",
-      value: "support@bloodlink.com",
+      value: "bloodlinkhelpline@gmail.com",
       color: "#7A2F2F",
     },
     {
       icon: Phone,
       label: "Phone",
-      value: "+91 98765 43210",
+      value: "+91 86603 74131",
       color: "#3F6B5C",
     },
     {

@@ -11,23 +11,65 @@ import {
   Clock,
   AlertCircle,
   Loader,
+  CheckCircle2,
+  XCircle,
+  Ban,
 } from "lucide-react";
 import { getPublicEmergencyRequestById } from "../../api/emergencyRequestApi";
+import { getMe } from "../../api/authApi";
+import {
+  offerDonation,
+  cancelDonationOffer,
+  getMyResponseForRequest,
+  getOffersForRequest,
+  completeDonationOffer,
+  declineDonationOffer,
+} from "../../api/donationApi";
 
 const RequestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [request, setRequest] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [myResponse, setMyResponse] = useState(null);
+  const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const isOwner =
+    currentUser &&
+    request &&
+    request.requesterType === "user" &&
+    request.requestedByUser?._id === currentUser.id;
 
   useEffect(() => {
-    const fetchRequestDetails = async () => {
+    const fetchAll = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await getPublicEmergencyRequestById(id);
-        setRequest(response.data.request);
+
+        const [requestRes, meRes] = await Promise.all([
+          getPublicEmergencyRequestById(id),
+          getMe(),
+        ]);
+
+        const fetchedRequest = requestRes.data.request;
+        const me = meRes.data.user;
+        setRequest(fetchedRequest);
+        setCurrentUser(me);
+
+        const iOwnThisRequest =
+          fetchedRequest.requesterType === "user" &&
+          fetchedRequest.requestedByUser?._id === me.id;
+
+        if (iOwnThisRequest) {
+          const offersRes = await getOffersForRequest(id);
+          setOffers(offersRes.data.offers || []);
+        } else {
+          const myResponseRes = await getMyResponseForRequest(id);
+          setMyResponse(myResponseRes.data.response);
+        }
       } catch (err) {
         console.error("Error fetching request details:", err);
         setError("Unable to load this emergency request.");
@@ -37,7 +79,7 @@ const RequestDetails = () => {
     };
 
     if (id) {
-      fetchRequestDetails();
+      fetchAll();
     }
   }, [id]);
 
@@ -45,10 +87,60 @@ const RequestDetails = () => {
     navigate("/user/dashboard");
   };
 
-  const handleDonate = () => {
-    // TODO: Implement donation response API
-    console.log("Donation response for request:", id);
-    alert("Donation response feature will be implemented soon.");
+  const handleDonate = async () => {
+    setActionLoading(true);
+    try {
+      const res = await offerDonation(id);
+      setMyResponse(res.data.response);
+      alert(res.data.message || "Your donation offer has been sent");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to send donation offer");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCancelOffer = async () => {
+    if (!myResponse) return;
+    setActionLoading(true);
+    try {
+      await cancelDonationOffer(myResponse._id);
+      setMyResponse(null);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to cancel offer");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCompleteOffer = async (responseId) => {
+    if (!window.confirm("Mark this donor's donation as completed?")) return;
+    setActionLoading(true);
+    try {
+      const res = await completeDonationOffer(responseId);
+      setOffers((prev) =>
+        prev.map((o) => (o._id === responseId ? res.data.response : o)),
+      );
+      setRequest((prev) => (prev ? { ...prev, status: "fulfilled" } : prev));
+      alert(res.data.message);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to complete donation");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeclineOffer = async (responseId) => {
+    if (!window.confirm("Decline this donor's offer?")) return;
+    setActionLoading(true);
+    try {
+      await declineDonationOffer(responseId);
+      setOffers((prev) => prev.filter((o) => o._id !== responseId));
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to decline offer");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   // Loading State
@@ -344,18 +436,120 @@ const RequestDetails = () => {
             </div>
           </div>
 
-          {/* Donor Action */}
+          {/* Donor Action / Offers Management */}
           <div className="mt-10 pt-6 border-t border-gray-200/60">
-            <button
-              onClick={handleDonate}
-              className="w-full sm:w-auto px-8 py-3.5 bg-[#7A2F2F] text-white rounded-2xl font-medium hover:bg-[#631F1F] transition-colors duration-200 shadow-sm hover:shadow-md"
-            >
-              I Can Donate
-            </button>
-            <p className="text-xs text-[#8C8579] mt-3">
-              By clicking "I Can Donate", you confirm your willingness to donate
-              blood for this emergency request.
-            </p>
+            {isOwner ? (
+              <div>
+                <h3 className="font-semibold text-[#1C2321] mb-1">
+                  Donation Offers
+                </h3>
+                <p className="text-xs text-[#8C8579] mb-4">
+                  Review donors who have offered to help with this request.
+                </p>
+
+                {offers.length === 0 && (
+                  <div className="bg-[#F6F3EC] rounded-2xl p-6 text-center">
+                    <p className="text-sm text-[#8C8579]">
+                      No donors have offered yet. Check back soon.
+                    </p>
+                  </div>
+                )}
+
+                {offers.length > 0 && (
+                  <div className="space-y-2">
+                    {offers.map((offer) => (
+                      <div
+                        key={offer._id}
+                        className="flex items-center justify-between gap-3 bg-[#F6F3EC] rounded-xl p-3.5"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-full bg-[#7A2F2F]/10 flex items-center justify-center flex-shrink-0">
+                            <span className="text-[#7A2F2F] font-medium text-sm">
+                              {offer.donor?.firstName?.charAt(0) || "D"}
+                            </span>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-[#1C2321] truncate">
+                              {offer.donor?.firstName} {offer.donor?.lastName}
+                            </p>
+                            <p className="text-xs text-[#8C8579] truncate">
+                              {offer.donor?.bloodGroup} &middot;{" "}
+                              {offer.donor?.phone}
+                            </p>
+                          </div>
+                        </div>
+
+                        {offer.status === "completed" ? (
+                          <span className="flex items-center gap-1 text-xs font-medium text-[#3F6B5C] flex-shrink-0">
+                            <CheckCircle2 size={14} />
+                            Completed
+                          </span>
+                        ) : (
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <button
+                              onClick={() => handleCompleteOffer(offer._id)}
+                              disabled={actionLoading}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-[#3F6B5C] text-white rounded-lg text-xs font-medium hover:bg-[#345a4d] transition-colors duration-200 disabled:opacity-60"
+                            >
+                              <CheckCircle2 size={13} />
+                              Complete
+                            </button>
+                            <button
+                              onClick={() => handleDeclineOffer(offer._id)}
+                              disabled={actionLoading}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-white border border-[#C23B22]/30 text-[#C23B22] rounded-lg text-xs font-medium hover:bg-[#C23B22]/5 transition-colors duration-200 disabled:opacity-60"
+                            >
+                              <XCircle size={13} />
+                              Decline
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : request.status !== "active" ? (
+              <div className="bg-[#F6F3EC] rounded-2xl p-5 text-center">
+                <p className="text-sm text-[#8C8579]">
+                  This request is no longer active.
+                </p>
+              </div>
+            ) : myResponse?.status === "completed" ? (
+              <div className="flex items-center gap-2 text-[#3F6B5C] font-medium text-sm">
+                <CheckCircle2 size={18} />
+                You completed this donation. Thank you!
+              </div>
+            ) : myResponse?.status === "pending" ? (
+              <div>
+                <div className="flex items-center gap-2 text-[#7A2F2F] font-medium text-sm mb-3">
+                  <Clock size={18} />
+                  Your donation offer is pending confirmation
+                </div>
+                <button
+                  onClick={handleCancelOffer}
+                  disabled={actionLoading}
+                  className="flex items-center gap-2 px-6 py-3 bg-white border border-[#C23B22]/30 text-[#C23B22] rounded-2xl font-medium hover:bg-[#C23B22]/5 transition-colors duration-200 disabled:opacity-60"
+                >
+                  <Ban size={16} />
+                  {actionLoading ? "Cancelling..." : "Cancel Offer"}
+                </button>
+              </div>
+            ) : (
+              <div>
+                <button
+                  onClick={handleDonate}
+                  disabled={actionLoading}
+                  className="w-full sm:w-auto px-8 py-3.5 bg-[#7A2F2F] text-white rounded-2xl font-medium hover:bg-[#631F1F] transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-60"
+                >
+                  {actionLoading ? "Sending..." : "I Can Donate"}
+                </button>
+                <p className="text-xs text-[#8C8579] mt-3">
+                  By clicking "I Can Donate", you confirm your willingness to
+                  donate blood for this emergency request.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -12,6 +12,10 @@ export const getNearbyEmergencyRequests = () => {
   return api.get("/emergency-requests/nearby");
 };
 
+export const getLandingEmergencyRequests = () => {
+  return api.get("/emergency-requests/landing");
+};
+
 export const getPublicEmergencyRequestById = (id) => {
   return api.get(`/emergency-requests/public/${id}`);
 };

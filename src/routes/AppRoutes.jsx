@@ -17,6 +17,10 @@ import HelpSupport from "../pages/user/HelpSupport";
 import ContactUs from "../pages/user/ContactUs";
 import CreateRequest from "../pages/user/CreateRequest";
 import MyRequests from "../pages/user/MyRequest";
+import Profile from "../pages/user/Profile";
+
+//Hospital Pages
+import HospitalDashboardPlaceholder from "../pages/hospital/DashboardPlaceholder";
 
 //Admin Pages
 import AdminDashboard from "../pages/admin/Dashboard";
@@ -48,6 +52,13 @@ function AppRoutes() {
       <Route path="/contact" element={<ContactUs />} />
       <Route path="/user/create-request" element={<CreateRequest />} />
       <Route path="/user/my-requests" element={<MyRequests />} />
+      <Route path="/user/profile" element={<Profile />} />
+
+      {/* Hospital Routes */}
+      <Route
+        path="/hospital-dashboard"
+        element={<HospitalDashboardPlaceholder />}
+      />
 
       {/* Admin Routes */}
       <Route
