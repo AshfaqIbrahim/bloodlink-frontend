@@ -9,7 +9,10 @@ import {
   Building2,
   Heart,
   CheckCircle,
+  Loader,
+  AlertCircle,
 } from "lucide-react";
+import { sendContactMessage } from "../../api/contactApi";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -25,11 +28,27 @@ const ContactSection = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    setTimeout(() => setIsSubmitted(false), 3000);
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    setError(null);
+    setIsSending(true);
+
+    try {
+      await sendContactMessage(formData);
+      setIsSubmitted(true);
+      setFormData({ name: "", email: "", subject: "", message: "" });
+      setTimeout(() => setIsSubmitted(false), 4000);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "Failed to send message. Please try again.",
+      );
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const contactInfo = [
@@ -210,11 +229,29 @@ const ContactSection = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[#7A2F2F] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#631f1f] transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
+                disabled={isSending}
+                className="w-full bg-[#7A2F2F] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#631f1f] transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                <Send className="w-4 h-4" />
-                Send Message
+                {isSending ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Send Message
+                  </>
+                )}
               </button>
+
+              {/* Error Message */}
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-[#C23B22]/10 rounded-xl border border-[#C23B22]/20 animate-fadeIn">
+                  <AlertCircle className="w-4 h-4 text-[#C23B22]" />
+                  <p className="text-sm text-[#C23B22] font-medium">{error}</p>
+                </div>
+              )}
 
               {/* Success Message */}
               {isSubmitted && (

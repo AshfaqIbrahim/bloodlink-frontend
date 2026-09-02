@@ -25,6 +25,7 @@ import {
   completeDonationOffer,
   declineDonationOffer,
 } from "../../api/donationApi";
+import toast from "react-hot-toast";
 
 const RequestDetails = () => {
   const { id } = useParams();
@@ -92,9 +93,11 @@ const RequestDetails = () => {
     try {
       const res = await offerDonation(id);
       setMyResponse(res.data.response);
-      alert(res.data.message || "Your donation offer has been sent");
+      toast.success(res.data.message || "Your donation offer has been sent");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to send donation offer");
+      toast.error(
+        err.response?.data?.message || "Failed to send donation offer",
+      );
     } finally {
       setActionLoading(false);
     }
@@ -107,7 +110,7 @@ const RequestDetails = () => {
       await cancelDonationOffer(myResponse._id);
       setMyResponse(null);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to cancel offer");
+      toast.error(err.response?.data?.message || "Failed to cancel offer");
     } finally {
       setActionLoading(false);
     }
@@ -122,9 +125,9 @@ const RequestDetails = () => {
         prev.map((o) => (o._id === responseId ? res.data.response : o)),
       );
       setRequest((prev) => (prev ? { ...prev, status: "fulfilled" } : prev));
-      alert(res.data.message);
+      toast.success(res.data.message);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to complete donation");
+      toast.error(err.response?.data?.message || "Failed to complete donation");
     } finally {
       setActionLoading(false);
     }
@@ -137,7 +140,7 @@ const RequestDetails = () => {
       await declineDonationOffer(responseId);
       setOffers((prev) => prev.filter((o) => o._id !== responseId));
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to decline offer");
+      toast.error(err.response?.data?.message || "Failed to decline offer");
     } finally {
       setActionLoading(false);
     }

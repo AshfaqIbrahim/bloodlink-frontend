@@ -7,6 +7,8 @@ import { loginHospital } from "../../api/hospitalApi";
 import { GoogleLogin } from "@react-oauth/google";
 import { googleLogin } from "../../api/authApi";
 
+import toast from "react-hot-toast";
+
 const InputField = ({
   icon: Icon,
   label,
@@ -93,7 +95,7 @@ function LoginPage() {
           password,
         });
 
-        alert(res.data.message);
+        toast.success(res.data.message);
         navigate("/hospital-dashboard");
       } else {
         res = await loginUser({
@@ -101,7 +103,7 @@ function LoginPage() {
           password,
         });
 
-        alert(res.data.message);
+        toast.success(res.data.message);
 
         if (res.data.user?.role === "admin") {
           navigate("/admin/dashboard");
@@ -111,11 +113,13 @@ function LoginPage() {
       }
     } catch (err) {
       if (err.response?.data?.notVerified) {
-        alert(err.response.data.message);
+        toast.error(err.response.data.message);
         navigate("/verify-otp", { state: { email } });
         return;
       }
-      alert(err.response?.data?.message || "Login failed. Please try again.");
+      toast.error(
+        err.response?.data?.message || "Login failed. Please try again.",
+      );
     }
   };
 
@@ -124,7 +128,7 @@ function LoginPage() {
     try {
       const res = await googleLogin(credentialResponse.credential);
 
-      alert(res.data.message);
+      toast.success(res.data.message);
 
       if (res.data.isNewUser) {
         navigate("/google-complete-registration", {
@@ -134,7 +138,7 @@ function LoginPage() {
         navigate("/user/dashboard");
       }
     } catch (err) {
-      alert(
+      toast.error(
         err.response?.data?.message || "Google login failed. Please try again.",
       );
     }
@@ -312,7 +316,7 @@ function LoginPage() {
                 <GoogleLogin
                   onSuccess={handleGoogleLogin}
                   onError={() => {
-                    alert("Google login failed. Please try again.");
+                    toast.error("Google login failed. Please try again.");
                   }}
                   useOneTap={false}
                   theme="outline"

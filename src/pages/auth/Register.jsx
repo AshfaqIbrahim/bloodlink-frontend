@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { registerUser } from "../../api/authApi";
 import { useNavigate, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import {
   User,
@@ -155,11 +156,13 @@ function UserRegisterPage() {
     e.preventDefault();
 
     if (!agreed) {
-      return alert("Please accept the Terms & Privacy Policy");
+      toast.error("Please accept the Terms & Privacy Policy");
+      return;
     }
 
     if (form.password !== form.confirm) {
-      return alert("Passwords do not match");
+      toast.error("Passwords do not match");
+      return;
     }
 
     try {
@@ -173,11 +176,10 @@ function UserRegisterPage() {
         confirmPassword: form.confirm,
       };
       const res = await registerUser(userData);
-      alert(res.data.message);
-
+      toast.success(res.data.message);
       navigate("/verify-otp", { state: { email: form.email } });
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || "Registration failed");
     }
   };
 

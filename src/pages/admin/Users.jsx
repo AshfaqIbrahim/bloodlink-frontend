@@ -1,4 +1,3 @@
-// src/pages/admin/Users.jsx
 import React, { useState, useEffect } from "react";
 import {
   User,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { getAllUsers, blockUser, unblockUser } from "../../api/adminApi";
+import toast from "react-hot-toast";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -44,7 +44,9 @@ const AdminUsers = () => {
       await actionFn(id);
       await fetchUsers();
     } catch (err) {
-      alert(err.response?.data?.message || "Action failed. Please try again.");
+      toast.error(
+        err.response?.data?.message || "Action failed. Please try again.",
+      );
     } finally {
       setActioningId(null);
     }

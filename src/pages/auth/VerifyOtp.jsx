@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { Mail, Loader } from "lucide-react";
 import { verifyOtp, resendOtp } from "../../api/authApi";
+import toast from "react-hot-toast";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
@@ -70,16 +71,17 @@ function VerifyOtp() {
     const otp = digits.join("");
 
     if (otp.length !== 4) {
-      return alert("Please enter the 4-digit code");
+      toast.error("Please enter the 4-digit code");
+      return;
     }
 
     setLoading(true);
     try {
       const res = await verifyOtp({ email, otp });
-      alert(res.data.message);
+      toast.success(res.data.message);
       navigate("/user/dashboard");
     } catch (err) {
-      alert(err.response?.data?.message || "Verification failed");
+      toast.error(err.response?.data?.message || "Verification failed");
       setDigits(["", "", "", ""]);
       inputRefs[0].current?.focus();
     } finally {
@@ -93,12 +95,12 @@ function VerifyOtp() {
     setResending(true);
     try {
       const res = await resendOtp(email);
-      alert(res.data.message);
+      toast.success(res.data.message);
       setCooldown(RESEND_COOLDOWN_SECONDS);
       setDigits(["", "", "", ""]);
       inputRefs[0].current?.focus();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to resend OTP");
+      toast.error(err.response?.data?.message || "Failed to resend OTP");
     } finally {
       setResending(false);
     }

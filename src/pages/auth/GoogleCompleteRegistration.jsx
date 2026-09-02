@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { User, Phone, Droplet } from "lucide-react";
 import { completeGoogleRegistration } from "../../api/authApi";
+import toast from "react-hot-toast";
 
 const InputField = ({
   icon: Icon,
@@ -109,7 +110,8 @@ function GoogleCompleteRegistration() {
     e.preventDefault();
 
     if (!form.firstName || !form.phone || !form.bloodGroup) {
-      return alert("Please fill all required fields");
+      toast.error("Please fill all required fields");
+      return;
     }
 
     setLoading(true);
@@ -123,10 +125,10 @@ function GoogleCompleteRegistration() {
         bloodGroup: form.bloodGroup,
       });
 
-      alert(res.data.message);
+      toast.success(res.data.message);
       navigate("/user/dashboard");
     } catch (err) {
-      alert(
+      toast.error(
         err.response?.data?.message || "Registration failed. Please try again.",
       );
     } finally {

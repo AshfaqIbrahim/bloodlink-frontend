@@ -1,35 +1,54 @@
 import React, { useEffect, useState } from "react";
 import { getMe } from "../../api/authApi";
 import { updateAvailability } from "../../api/userApi";
+import { getMyDonationStats } from "../../api/donationApi";
 
-import {
-  Clock,
-  Calendar,
-  MapPin,
-  AlertCircle,
-  CheckCircle,
-  XCircle,
-  Droplet,
-} from "lucide-react";
+import { Clock, Calendar, MapPin, AlertCircle, Droplet } from "lucide-react";
+
+const formatDate = (dateInput) => {
+  if (!dateInput) return null;
+  return new Date(dateInput).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const formatDateTime = (dateInput) => {
+  if (!dateInput) return null;
+  return new Date(dateInput).toLocaleString("en-IN", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 const AvailabilitySection = () => {
+  const [user, setUser] = useState(null);
+  const [donationStats, setDonationStats] = useState(null);
   const [isAvailable, setIsAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getMe();
-        setIsAvailable(response.data.user.isAvailable);
+        const [meRes, statsRes] = await Promise.all([
+          getMe(),
+          getMyDonationStats(),
+        ]);
+        setUser(meRes.data.user);
+        setIsAvailable(meRes.data.user.isAvailable);
+        setDonationStats(statsRes.data.stats);
       } catch (error) {
-        console.error("Failed to fetch availability:", error);
+        console.error("Failed to fetch availability info:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
+    fetchData();
   }, []);
 
   const toggleAvailability = async () => {
@@ -40,6 +59,9 @@ const AvailabilitySection = () => {
       const response = await updateAvailability(newStatus);
 
       setIsAvailable(response.data.user.isAvailable);
+      setUser((prev) =>
+        prev ? { ...prev, updatedAt: new Date().toISOString() } : prev,
+      );
     } catch (error) {
       console.error("Failed to update availability:", error);
     } finally {
@@ -47,32 +69,36 @@ const AvailabilitySection = () => {
     }
   };
 
-  const infoCards = [
-    {
-      icon: Clock,
-      label: "Last Updated",
-      value: "Today, 10:30 AM",
-      color: "#8C8579",
-    },
-    {
-      icon: Calendar,
-      label: "Next Eligible Donation",
-      value: "15 August 2026",
-      color: "#3F6B5C",
-    },
-    {
-      icon: MapPin,
-      label: "Donation Radius",
-      value: "15 km",
-      color: "#7A2F2F",
-    },
-    {
-      icon: Droplet,
-      label: "Blood Type",
-      value: "O+",
-      color: "#C23B22",
-    },
-  ];
+  const infoCards = user
+    ? [
+        {
+          icon: Clock,
+          label: "Last Updated",
+          value: formatDateTime(user.updatedAt) || "--",
+          color: "#8C8579",
+        },
+        {
+          icon: Calendar,
+          label: "Next Eligible Donation",
+          value: donationStats?.nextEligibleDate
+            ? formatDate(donationStats.nextEligibleDate)
+            : "Eligible now",
+          color: "#3F6B5C",
+        },
+        {
+          icon: MapPin,
+          label: "District",
+          value: user.address?.district || "Not set",
+          color: "#7A2F2F",
+        },
+        {
+          icon: Droplet,
+          label: "Blood Type",
+          value: user.bloodGroup || "--",
+          color: "#C23B22",
+        },
+      ]
+    : [];
 
   return (
     <section className="w-full bg-[#F6F3EC] p-4 md:p-6 lg:p-8 animate-fadeIn">
@@ -137,32 +163,34 @@ const AvailabilitySection = () => {
             contact you during emergencies.
           </p>
 
-          {/* Information Grid - 4 Cards
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {infoCards.map((card, index) => (
-              <div
-                key={index}
-                className="bg-[#F6F3EC] rounded-2xl p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#FCFBF8] flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-all duration-300">
-                    <card.icon
-                      className="w-4 h-4"
-                      style={{ color: card.color }}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-medium text-[#8C8579] uppercase tracking-wider">
-                      {card.label}
-                    </p>
-                    <p className="text-sm font-semibold text-[#1C2321] mt-0.5 truncate">
-                      {card.value}
-                    </p>
+          {/* Information Grid - 4 Cards */}
+          {!loading && user && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {infoCards.map((card, index) => (
+                <div
+                  key={index}
+                  className="bg-[#F6F3EC] rounded-2xl p-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#FCFBF8] flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-all duration-300">
+                      <card.icon
+                        className="w-4 h-4"
+                        style={{ color: card.color }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-medium text-[#8C8579] uppercase tracking-wider">
+                        {card.label}
+                      </p>
+                      <p className="text-sm font-semibold text-[#1C2321] mt-0.5 truncate">
+                        {card.value}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div> */}
+              ))}
+            </div>
+          )}
 
           {/* Footer Info Card */}
           <div className="flex items-start gap-4 p-5 bg-[#7A2F2F]/5 rounded-2xl border border-[#7A2F2F]/10 hover:bg-[#7A2F2F]/8 transition-all duration-300">

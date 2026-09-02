@@ -1,4 +1,3 @@
-// src/pages/user/MyRequests.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,6 +13,7 @@ import {
   getMyEmergencyRequests,
   cancelEmergencyRequest,
 } from "../../api/emergencyRequestApi";
+import toast from "react-hot-toast";
 
 const MyRequests = () => {
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const MyRequests = () => {
         prev.map((r) => (r._id === id ? { ...r, status: "cancelled" } : r)),
       );
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to cancel request.");
+      toast.error(err.response?.data?.message || "Failed to cancel request.");
     } finally {
       setCancellingId(null);
     }

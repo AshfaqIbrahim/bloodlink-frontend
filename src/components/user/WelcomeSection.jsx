@@ -1,24 +1,39 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getMe } from "../../api/authApi";
-import { User, Droplet, Clock, MapPin, Heart, Calendar } from "lucide-react";
+import { getMyDonationStats } from "../../api/donationApi";
+import {
+  User,
+  Droplet,
+  Clock,
+  MapPin,
+  Heart,
+  Calendar,
+  Shield,
+} from "lucide-react";
 
 const WelcomeSection = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [donationStats, setDonationStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getMe();
-
-        setUser(response.data.user);
+        const [meRes, statsRes] = await Promise.all([
+          getMe(),
+          getMyDonationStats(),
+        ]);
+        setUser(meRes.data.user);
+        setDonationStats(statsRes.data.stats);
       } catch (error) {
         console.error("Failed to fetch user:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchUser();
+    fetchData();
   }, []);
 
   //temp==========
@@ -46,6 +61,23 @@ const WelcomeSection = () => {
   let greeting = "Good Morning";
   if (hour >= 12 && hour < 17) greeting = "Good Afternoon";
   else if (hour >= 17) greeting = "Good Evening";
+
+  const formatShortDate = (dateInput) => {
+    if (!dateInput) return "--";
+    return new Date(dateInput).toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const formatFullDate = (dateInput) => {
+    if (!dateInput) return "--";
+    return new Date(dateInput).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   return (
     <section
@@ -80,7 +112,10 @@ const WelcomeSection = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 animate-fadeIn">
-              <button className="flex-1 bg-[#7A2F2F] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#631f1f] transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2">
+              <button
+                onClick={() => navigate("/user/emergency-requests")}
+                className="flex-1 bg-[#7A2F2F] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#631f1f] transition-all duration-300 shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
+              >
                 <MapPin className="w-4 h-4" />
                 Find Nearby Requests
               </button>
@@ -115,67 +150,68 @@ const WelcomeSection = () => {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-[#F6F3EC] rounded-xl p-3 text-center">
-                  <p className="text-[#8C8579] text-xs font-medium">Email</p>
+                  <p className="text-[#8C8579] text-xs font-medium">
+                    Total Donations
+                  </p>
                   <p className="text-[#1C2321] text-sm font-semibold mt-0.5">
-                    {user.email}
+                    {donationStats?.totalDonations ?? "--"}
                   </p>
                 </div>
                 <div className="bg-[#F6F3EC] rounded-xl p-3 text-center">
-                  <p className="text-[#8C8579] text-xs font-medium">Phone</p>
-                  <p className="text-[#1C2321] text-sm font-semibold mt-0.5">
-                    {user.phone}
+                  <p className="text-[#8C8579] text-xs font-medium">District</p>
+                  <p className="text-[#1C2321] text-sm font-semibold mt-0.5 truncate">
+                    {user.address?.district || "Not set"}
                   </p>
                 </div>
                 <div className="bg-[#F6F3EC] rounded-xl p-3 text-center">
                   <p className="text-[#8C8579] text-xs font-medium">
-                    Blood Group
+                    Member Since
                   </p>
                   <p className="text-[#1C2321] text-sm font-semibold mt-0.5">
-                    {user.bloodGroup}
+                    {formatShortDate(user.createdAt)}
                   </p>
                 </div>
                 <div className="bg-[#F6F3EC] rounded-xl p-3 text-center">
-                  <p className="text-[#8C8579] text-xs font-medium">Role</p>
+                  <p className="text-[#8C8579] text-xs font-medium">
+                    Next Eligible
+                  </p>
                   <p className="text-[#1C2321] text-sm font-semibold mt-0.5">
-                    {user.role}
+                    {donationStats?.nextEligibleDate
+                      ? formatFullDate(donationStats.nextEligibleDate)
+                      : "Now"}
                   </p>
                 </div>
               </div>
 
               {/* Reliability Score */}
-              {/* <div className="mb-6">
+              <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-[#1C2321] flex items-center gap-2">
                     <Shield className="w-4 h-4 text-[#7A2F2F]" />
                     Reliability Score
                   </span>
                   <span className="text-lg font-poppins font-bold text-[#7A2F2F]">
-                    {user.reliabilityScore}%
+                    {donationStats?.reliabilityScore === null ||
+                    donationStats?.reliabilityScore === undefined
+                      ? "New"
+                      : `${donationStats.reliabilityScore}%`}
                   </span>
                 </div>
                 <div className="w-full h-2 bg-[#F6F3EC] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-[#7A2F2F] rounded-full transition-all duration-1000"
-                    style={{ width: `${user.reliabilityScore}%` }}
+                    style={{
+                      width: `${donationStats?.reliabilityScore ?? 0}%`,
+                    }}
                   />
                 </div>
-              </div> */}
-
-              {/* Donation Level */}
-              {/* <div className="flex items-center justify-between p-3 bg-[#7A2F2F]/5 rounded-xl mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#7A2F2F]/10 rounded-xl flex items-center justify-center">
-                    <Award className="w-5 h-5 text-[#7A2F2F]" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-[#8C8579]">Donation Level</p>
-                    <p className="text-sm font-semibold text-[#1C2321]">
-                      {user.donationLevel}
-                    </p>
-                  </div>
-                </div>
-                <TrendingUp className="w-5 h-5 text-[#3F6B5C]" /> */}
-              {/* </div> */}
+                {(donationStats?.reliabilityScore === null ||
+                  donationStats?.reliabilityScore === undefined) && (
+                  <p className="text-xs text-[#8C8579] mt-1.5">
+                    Complete a donation to build your score.
+                  </p>
+                )}
+              </div>
 
               {/* Inspirational Quote */}
               <div className="border-t border-[#8C8579]/10 pt-4">

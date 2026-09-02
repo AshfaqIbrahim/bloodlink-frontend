@@ -20,6 +20,7 @@ import {
   blockHospital,
   unblockHospital,
 } from "../../api/adminApi";
+import toast from "react-hot-toast";
 
 const TABS = [
   { value: "all", label: "All" },
@@ -74,7 +75,9 @@ const AdminHospitals = () => {
       await actionFn(id);
       await fetchHospitals();
     } catch (err) {
-      alert(err.response?.data?.message || "Action failed. Please try again.");
+      toast.error(
+        err.response?.data?.message || "Action failed. Please try again.",
+      );
     } finally {
       setActioningId(null);
     }

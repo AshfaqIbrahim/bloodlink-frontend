@@ -1,4 +1,3 @@
-// src/pages/admin/Requests.jsx
 import React, { useState, useEffect } from "react";
 import {
   AlertCircle,
@@ -15,6 +14,7 @@ import {
   getAllEmergencyRequests,
   forceCancelEmergencyRequest,
 } from "../../api/adminApi";
+import toast from "react-hot-toast";
 
 const TABS = [
   { value: "all", label: "All" },
@@ -89,7 +89,7 @@ const AdminRequests = () => {
       await forceCancelEmergencyRequest(id);
       await fetchRequests();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to cancel request.");
+      toast.error(err.response?.data?.message || "Failed to cancel request.");
     } finally {
       setActioningId(null);
     }

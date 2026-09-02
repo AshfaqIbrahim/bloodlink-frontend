@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { registerHospital } from "../../api/hospitalApi";
+import toast from "react-hot-toast";
 import {
   Mail,
   Phone,
@@ -106,11 +107,11 @@ const HospitalRegistration = () => {
     e.preventDefault();
 
     if (!form.agree1 || !form.agree2) {
-      alert("Please accept the required agreements");
+      toast.error("Please accept the required agreements");
       return;
     }
     if (form.password !== form.confirm) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -126,13 +127,12 @@ const HospitalRegistration = () => {
       });
 
       console.log("Hospital registration:", response.data);
-      alert("Hospital account created successfully!");
-
+      toast.success("Hospital account created successfully!");
       navigate("/login");
     } catch (error) {
       console.error("Hospital registration error:", error);
 
-      alert(
+      toast.error(
         error.response?.data?.message ||
           "Hospital registration failed. Please try again.",
       );

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { User, Phone, Droplet, MapPin, Loader, ArrowLeft } from "lucide-react";
 import { getMe } from "../../api/authApi";
 import { updateProfile } from "../../api/userApi";
+import toast from "react-hot-toast";
 
 const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -83,9 +84,9 @@ const Profile = () => {
           pincode: form.pincode,
         },
       });
-      alert(res.data.message || "Profile updated successfully");
+      toast.success(res.data.message || "Profile updated successfully");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to update profile");
+      toast.error(err.response?.data?.message || "Failed to update profile");
     } finally {
       setSaving(false);
     }

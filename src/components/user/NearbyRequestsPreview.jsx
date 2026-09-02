@@ -12,6 +12,26 @@ import {
 } from "lucide-react";
 import { getNearbyEmergencyRequests } from "../../api/emergencyRequestApi";
 
+const RequesterBadge = ({ request }) => {
+  const isHospital = request.requesterType === "hospital";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
+        isHospital
+          ? "bg-[#3F6B5C]/10 text-[#3F6B5C]"
+          : "bg-[#7A2F2F]/10 text-[#7A2F2F]"
+      }`}
+    >
+      {isHospital ? (
+        <Hospital className="w-3 h-3" />
+      ) : (
+        <User className="w-3 h-3" />
+      )}
+      {isHospital ? "Hospital" : "Individual"}
+    </span>
+  );
+};
+
 const NearbyRequestsPreview = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,26 +92,6 @@ const NearbyRequestsPreview = () => {
       );
     }
     return "Individual Requester";
-  };
-
-  const RequesterBadge = ({ request }) => {
-    const isHospital = request.requesterType === "hospital";
-    return (
-      <span
-        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
-          isHospital
-            ? "bg-[#3F6B5C]/10 text-[#3F6B5C]"
-            : "bg-[#7A2F2F]/10 text-[#7A2F2F]"
-        }`}
-      >
-        {isHospital ? (
-          <Hospital className="w-3 h-3" />
-        ) : (
-          <User className="w-3 h-3" />
-        )}
-        {isHospital ? "Hospital" : "Individual"}
-      </span>
-    );
   };
 
   return (

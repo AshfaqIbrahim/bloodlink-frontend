@@ -1,4 +1,3 @@
-// src/pages/user/CreateRequest.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,6 +13,7 @@ import {
   Send,
 } from "lucide-react";
 import { createEmergencyRequest } from "../../api/emergencyRequestApi";
+import toast from "react-hot-toast";
 
 const FormField = ({
   icon: Icon,
@@ -126,7 +126,8 @@ const CreateRequest = () => {
       !formData.district ||
       !formData.location
     ) {
-      return alert("Please fill all required fields");
+      toast.error("Please fill all required fields");
+      return;
     }
 
     setSubmitting(true);
@@ -139,10 +140,10 @@ const CreateRequest = () => {
 
       const res = await createEmergencyRequest(payload);
 
-      alert(res.data.message || "Request created successfully!");
+      toast.success(res.data.message || "Request created successfully!");
       navigate("/user/dashboard");
     } catch (err) {
-      alert(
+      toast.error(
         err.response?.data?.message ||
           "Failed to create request. Please try again.",
       );
